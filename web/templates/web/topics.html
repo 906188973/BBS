@@ -1,0 +1,94 @@
+{% extends 'layout/basic.html' %}
+{% block title %}{{ forum.forum_name }}{% endblock %}
+
+{% block css %}
+
+{% endblock %}
+
+
+    {% block content %}
+    <h1>{{ forum.forum_name }}</h1>
+        {% if  forum.id in user_forum %}
+        <a id='concerned_{{ forum.id }}' href="javascript:unConcerned({{ forum.id }});">取消关注</a>
+        {% else %}
+        <a id='concerned_{{ forum.id }}' href="javascript:Concerned({{ forum.id }});">关注</a>
+        {% endif %}
+    <ul>
+        {% for topic in topics %}
+        <li>
+            {{ topic.floor_count }} -
+            <a href="{% url 'web:topic' topic.id %}">{{ topic }}</a> ——
+            <a href="{% url 'web:other' topic.owner.id %}">{{ topic.owner }}</a>
+        </li>
+        {% empty %}
+        <li>没有帖子请创建</li>
+        {% endfor %}
+    </ul>
+    <p>发表新贴</p>
+    <form action="{% url 'web:forum' forum.id %}" method="post">
+        {% csrf_token %}
+        {{ form_topic.as_p }}
+        <br>
+        {{ form_floor.as_p }}
+        <button name="submit">发表</button>
+    </form>
+    <div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li>
+              <a href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+              <a href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+    </div>
+    {% endblock content %}
+
+{% block js %}
+  <script>
+    $("#forum").show();
+    $("#forum").text("{{ forum.forum_name }}");
+    $("#forum").attr("href","{% url 'web:forum' forum.id %}");
+    function Concerned(id) {
+            var pk = id
+            var url = '/concerned/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#concerned_'+id).text("取消关注");
+                    var script = 'javascript:unConcerned(' + pk + ');'
+                    $('#concerned_'+id).attr("href",script);
+                    }
+                }
+            })
+        }
+        function unConcerned(id) {
+            var pk = id
+            var url = '/unconcerned/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#concerned_'+id).text("关注");
+                    var script = 'javascript:Concerned(' + pk + ');'
+                    $('#concerned_'+id).attr("href",script);
+                    }
+                }
+            })
+        }
+  </script>
+{% endblock%}

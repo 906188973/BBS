@@ -1,0 +1,58 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+{% block title %}首页{% endblock %}
+{% block css %}
+    
+{% endblock %}
+
+{% block content %}
+    {% for forum in forums %}
+    <div>
+        <a href="{% url 'web:forum' forum.id%}">{{ forum.forum_name }}</a>
+        {% if  forum.id in user_forum %}
+        <a id='concerned_{{ forum.id }}' href="javascript:unConcerned({{ forum.id }});">取消关注</a>
+        {% else %}
+        <a id='concerned_{{ forum.id }}' href="javascript:Concerned({{ forum.id }});">关注</a>
+        {% endif %}
+    </div>
+    {% endfor%}
+    <div>
+        <a href="{% url 'web:create_forum' %}">创建贴吧</a>
+    </div>
+{% endblock %}
+
+{% block js %}
+    <script>
+        function Concerned(id) {
+            var pk = id
+            var url = '/concerned/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#concerned_'+id).text("取消关注");
+                    var script = 'javascript:unConcerned(' + pk + ');'
+                    $('#concerned_'+id).attr("href",script);
+                    }
+                }
+            })
+        }
+        function unConcerned(id) {
+            var pk = id
+            var url = '/unconcerned/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#concerned_'+id).text("关注");
+                    var script = 'javascript:Concerned(' + pk + ');'
+                    $('#concerned_'+id).attr("href",script);
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}

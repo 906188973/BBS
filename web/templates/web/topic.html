@@ -1,0 +1,241 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+{% block title %}帖子{% endblock %}
+
+{% block css %}
+<style>
+img.floor_head{
+    width: 80px;
+    height: 80px;
+    border-style: solid;
+    border-color: black;
+    border-width: 4px;
+    }
+img.comment_head{
+    width: 40px;
+    height: 40px;
+    }
+</style>
+{% endblock %}
+
+    {% block content %}
+    <h1>{{ topic }}</h1>
+        {% if  topic.id in collect %}
+        <a id='collect_{{ topic.id }}' href="javascript:unCollect({{ topic.id }});">取消收藏</a>
+        {% else %}
+        <a id='collect_{{ topic.id }}' href="javascript:Collect({{ topic.id }});">收藏</a>
+        {% endif %}
+    <ul>
+        {% for floor in floors %}
+        <li id="floor_{{ floor.id }}">
+            {% if floor.owner.head_portrait %}
+            <img class='floor_head' src='{{ floor.owner.head_portrait.url }}'>
+            {% else %}
+            <img class='floor_head' src="{% static 'img/default.jpg' %}">
+            {% endif %}
+            <div>
+              <a href="{% url 'web:other' floor.owner.id %}">{{ floor.owner }} - </a>
+              <p>{{ floor.floor_text|linebreaks }}</p>
+            </div>
+            <div>
+              <p id="reply_father">{{ floor.floor_number }}楼&nbsp;&nbsp;&nbsp;
+                {{ floor.date_added|date:'Y-m-d H:i' }}</p>
+                <a href="javascript:replyShow({{ floor.id }});">回复</a>
+                {% if floor.owner == request.user %}
+                <a href="javascript:floorDel({{ floor.id }});">删除</a>
+                {% endif %}
+                <a>点赞</a>
+            </div>
+            <div id="reply_form_{{ floor.id }}" style="display:none">
+                <div id="reply_list_{{ floor.id }}">
+                {% for reply in floor.comment_set.all %}
+                    <div id="reply_{{ reply.id }}">
+                        {% if reply.owner.head_portrait %}
+                        <img class='comment_head' src='{{ reply.owner.head_portrait.url }}'>
+                        {% else %}
+                        <img class='comment_head' src="{% static 'img/default.jpg' %}">
+                        {% endif %}
+                        {% if reply.by_owner == Null %}
+                        <a href="{% url 'web:other' reply.owner.id %}">{{ reply.owner }}</a>
+                        {% else %}
+                        <a href="{% url 'web:other' reply.owner.id %}">{{ reply.owner }}</a>:回复 
+                          {% if reply.by_owner.head_portrait %}
+                          <img class='comment_head' src='{{ reply.by_owner.head_portrait.url }}'>
+                          {% else %}
+                          <img class='comment_head' src="{% static 'img/default.jpg' %}">
+                          {% endif %}
+                        <a href="{% url 'web:other' reply.by_owner.id %}">{{ reply.by_owner }}</a>
+                        {% endif %}
+                        <span> ({{ reply.date_added|date:'Y-m-d H:i' }}):</span>
+                        <span>{{ reply.text }}</span>
+                        <div>
+                            <a href="javascript:reply({{ reply.id }});">回复</a>
+                            {% if reply.owner == request.user %}
+                            <a href="javascript:replyDel({{ reply.id }});">删除</a>
+                            {% endif %}
+                            <a>点赞</a>
+                        </div>
+                    </div>
+                {% endfor %}
+                </div>
+                <form action="{% url 'web:update_comment' %}" id="replyForm_{{ floor.id }}" method="post">
+                    {% csrf_token %}
+                    <textarea id="reply_text_{{ floor.id }}" name="reply_text"></textarea>
+                    <input type="hidden" id="floor_id_{{ floor.id }}" name="floor_id" value="{{ floor.id }}">
+                    <input type="hidden" id="reply_comment_{{ floor.id }}" class="comment_id" name="comment_id" value="0">
+<!--                    <input type="submit" id="replySubmit_{{ floor.id }}" value="发送">-->
+                    <button type="button" id="{{ floor.id }}" onclick="replySubmit({{ floor.id }})">发送</button>
+                </form>
+            </div>
+        </li>
+        {% empty %}
+        <li>没有回复</li>
+        {% endfor %}
+    </ul>
+    <p>发表回复</p>
+    <form action="{% url 'web:topic' topic.id%}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button name="submit">发表</button>
+    </form>
+    <div>
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            <li>
+              <a href="#" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+              </a>
+            </li>
+            <li><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li>
+              <a href="#" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+              </a>
+            </li>
+          </ul>
+        </nav>
+    </div>
+    {% endblock %}
+
+{% block js %}
+<script>
+    $.ajaxSetup({
+        data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+    })
+    $(function(){
+
+    });
+    function replySubmit(id){
+        $.ajax({
+            url:"{% url 'web:update_comment' %}",
+            type:"POST",
+            data:$('#replyForm_'+id).serialize(), //所以字段数据 + csrf token
+            dataType:"JSON",
+            success:function (res) {
+                if(res.status){
+                    if(res.owner_status){
+                        var comment_html = '<div id="reply_' + res.reply_id + '"><span>' + res.username +
+                                     ':回复' + res.by_owner + '</span><span> (' +
+                                     res.comment_time + '):</span><div><span>' + res.text +
+                                     '</span><a >回复</a><a href="javascript:replyDel(' +
+                                     res.reply_id + ');"> 删除</a></div></div>';
+                    }else{
+                        var comment_html = '<div id="reply_' + res.reply_id + '"><span>' + res.username + '</span><span> (' +
+                                     res.comment_time + '):</span><div><span>' + res.text +
+                                     '</span><a >回复</a><a href="javascript:replyDel(' +
+                                     res.reply_id + ');"> 删除</a></div></div>';
+                        }
+                    $("#reply_list_"+id).append(comment_html);
+                }else{
+                       console.log('error');
+                }
+            }
+        })
+        $('#reply_text_'+id).val('');
+    }
+    function reply(id){
+            // 设置值
+            $('.comment_id').val(id);
+        }
+    function replyShow(id){
+            // 设置值
+            $('#reply_comment_id').val(id);
+            $("#reply_form_"+id).toggle();
+            $('.reply_comment_id').val(0);
+        }
+
+
+        function floorDel(id) {
+            var flag = confirm("您真的确定要删除吗？")
+            if (flag) {
+                var pk = id
+                var url = '/floor_del/' + pk + '/'
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    success: function (res) {
+                        if(res.status){
+                        $('#floor_'+id).remove()
+                        }
+                    }
+                })
+            }
+        }
+        function replyDel(id) {
+            var flag = confirm("您确定要删除您的回复吗？")
+            if (flag) {
+                var pk = id
+                var url = '/comment_del/' + pk + '/'
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    success: function (res) {
+                        if(res.status){
+                        $('#reply_'+id).remove()
+                        }
+                    }
+                })
+            }
+        }
+    $("#forum").show();
+    $("#forum").text("{{ topic.forum.forum_name }}");
+    $("#forum").attr("href","{% url 'web:forum' topic.forum.id %}");
+    $("#topic").show();
+    $("#topic").text("{{ topic.topic_text|slice:":10" }}");
+    $("#topic").attr("href","{% url 'web:topic' topic.id %}");
+    function Collect(id) {
+            var pk = id
+            var url = '/collect/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#collect_'+id).text("取消收藏");
+                    var script = 'javascript:unCollect(' + pk + ');'
+                    $('#collect_'+id).attr("href",script);
+                    }
+                }
+            })
+        }
+        function unCollect(id) {
+            var pk = id
+            var url = '/uncollect/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#collect_'+id).text("收藏");
+                    var script = 'javascript:Collect(' + pk + ');'
+                    $('#collect_'+id).attr("href",script);
+                    }
+                }
+            })
+        }
+</script>
+{% endblock %}

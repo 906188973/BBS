@@ -1,0 +1,65 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+{% block title %}修改权限{% endblock %}
+{% block css %}
+    
+{% endblock %}
+
+{% block content %}
+    {% if request.user.power == 4 %}
+    <h1>修改版主</h1>
+    {% elif request.user.power == 3 %}
+    <h1>修改版务</h1>
+    {% endif %}
+      <select id="lcomuli" class="form-control">
+        {% for forum in forums %}
+        <option value={{ forum.id }}>{{ forum }}</option>
+        {% endfor %}
+      </select>
+    {% if request.user.power == 4 %}
+      <button type="button" onclick="moderator({{ user.id }})">修改</button>
+    {% elif request.user.power == 3 %}
+      <button type="button" onclick="Submit({{ user.id }})">修改</button>
+    {% endif %}
+{% endblock %}
+
+{% block js %}
+    <script>
+        $.ajaxSetup({
+          data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+        })
+        function Submit(id){
+            var url = '/change_power/' + id + '/';
+            var a = $('#lcomuli option:selected').val();
+            console.log(a) ;
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {value: a},
+                dataType: "JSON",
+                success:function (res) {
+                 if(res.status){
+                     location.href = location.href;
+                    }
+                }
+            })
+        }
+        function moderator(id){
+            var url = '/moderator/' + id + '/';
+            var a = $('#lcomuli option:selected').val();
+            console.log(a) ;
+            $.ajax({
+                url: url,
+                type: "POST",
+                data: {value: a},
+                dataType: "JSON",
+                success:function (res) {
+                 if(res.status){
+                     location.href = location.href;
+                    }
+                }
+            })
+        }
+    </script>
+{% endblock %}
