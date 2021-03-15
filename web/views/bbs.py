@@ -160,18 +160,28 @@ def concerned(request, id):
         if obj:
             obj.status = True
             obj.save()
+            forum = Forum.objects.get(id=int(id))
+            forum.concern_count += 1
+            forum.save()
         else:
             user_forum = UserToForum()
             forum = Forum.objects.get(id=int(id))
-            user_forum.forum = forum
             user_forum.user = request.user
+            user_forum.forum = forum
             user_forum.save()
+
+            forum.concern_count += 1
+            forum.save()
 
 
         return JsonResponse({'status': 'True'})
 
 def unconcerned(request, id):
     if request.method == 'POST':
+        forum = Forum.objects.get(id=int(id))
+        forum.concern_count -= 1
+        forum.save()
+
         obj = UserToForum.objects.filter(forum_id=int(id), user=request.user).first()
         obj.status = False
         obj.save()

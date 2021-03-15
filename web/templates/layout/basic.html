@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="{% static 'plugin/bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'plugin/font-awesome/css/font-awesome.min.css' %}">
     <style>
+      .content{
+        width: 1000px;
+        margin:0px auto;
+      }
       .account{
         width: 400px;
         margin: 0 auto;
@@ -14,6 +18,17 @@
       .error-msg{
           color:red;
           position:absolute;
+      }
+        .logo{
+      width: 150px;
+      height: 150px;
+      }
+  img.logo1{
+      width: 150px;
+      height: 150px;
+      border-style: solid;
+      border-color: black;
+      border-width: 4px;
       }
     </style>
     {% block css %}{% endblock %}
@@ -44,7 +59,6 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{ request.user.username }}<span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="{% url 'web:account' %}">个人主页</a></li>
-              <li><a href="#">管理中心</a></li>
               <li role="separator" class="divider"></li>
               <li><a href="{% url 'web:logout' %}">退出</a></li>
             </ul>

@@ -16,6 +16,7 @@ class UserInfo(models.Model):
     head_portrait = models.ImageField(verbose_name='头像', null=True, upload_to='headPortrait/')
     power = models.SmallIntegerField(choices=POWER_CHOICES, default=1)
     power_name = models.CharField(max_length=20, default='普通用户')
+    describe = models.TextField(verbose_name='个性签名', null=True)
 
     def __str__(self):
         return self.username

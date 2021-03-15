@@ -21,10 +21,11 @@ class TopicForm(forms.ModelForm):
         model = Topic
         fields = ['topic_text']
         labels = {'topic_text': ''}
+        widgets = {'topic_text': forms.TextInput(attrs={'style': "width: 756.68px;"})}
 
 class FloorForm(forms.ModelForm):
     class Meta:
         model = Floor
         fields = ['floor_text']
         labels = {'floor_text': ''}
-        widgets = {'floor_text': forms.Textarea(attrs={'cols': 80})}
+        widgets = {'floor_text': forms.Textarea(attrs={'cols': 115, 'style': "resize:none"})}
