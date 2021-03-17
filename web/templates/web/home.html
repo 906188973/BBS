@@ -73,7 +73,7 @@
             <h4>你关注的版块</h4>
             {% for concerned in request.user.usertoforum_set.all %}
             {% if concerned.status == 1 %}
-            <div id='concerned_{{ concerned.forum.id }}' >
+            <div id="user_concerned_{{ concerned.forum.id }}" >
                 <a class="concerned" href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
             </div>
             {% endif %}
@@ -116,7 +116,6 @@
                     if(res.status){
                     $('#concerned_'+id).text("取消关注");
                     var script = 'javascript:unConcerned(' + pk + ');'
-                    $('#concerned_'+id).attr("href",script);
                     }
                 }
             })
@@ -132,6 +131,7 @@
                     $('#concerned_'+id).text("关注");
                     var script = 'javascript:Concerned(' + pk + ');'
                     $('#concerned_'+id).attr("href",script);
+                    $('#user_concerned_'+id).remove();
                     }
                 }
             })

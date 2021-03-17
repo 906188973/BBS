@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from web.form.bbs import ForumForm, TopicForm, FloorForm
 from django.http import JsonResponse, HttpResponseRedirect
 from web.models import Topic, Forum, Floor, Comment, UserToForum, Collect, UserInfo, ForumPower
+from web.models import FloorGreat, CommentGreat
 from django.db.models import Max
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
@@ -13,9 +14,7 @@ def create_forum(request):
         context = {'form': form}
         return render(request, 'web/create_forum.html', context)
     form = ForumForm(request.POST, request.FILES)
-    print(request.FILES)
     if form.is_valid():
-        print('进入')
         forum = form.save(commit=False)
         forum.moderator = request.user
         forum.save()
@@ -71,6 +70,17 @@ def topic(request, topic_id):
     collect = []
     for i in obj:
         collect.append(i.topic.id)
+
+    obj = FloorGreat.objects.filter(user=request.user, status=True).all()
+    floorgreat = []
+    for i in obj:
+        floorgreat.append(i.floor.id)
+
+    obj = CommentGreat.objects.filter(user=request.user, status=True).all()
+    commentgreat = []
+    for i in obj:
+        commentgreat.append(i.comment.id)
+
     """回复帖子"""
     if request.method != 'POST':
         form = FloorForm()
@@ -91,6 +101,8 @@ def topic(request, topic_id):
             return HttpResponseRedirect(reverse('web:topic', args=[topic_id]))
     context = {'topic': topic, 'floors': floors, 'form': form}
     context['collect'] = collect
+    context['floorgreat'] = floorgreat
+    context['commentgreat'] = commentgreat
     return render(request, 'web/topic.html', context)
 
 def update_comment(request):
@@ -252,3 +264,63 @@ def moderator(request, id):
     user.power_name = '版主'
     user.save()
     return JsonResponse({'status': 'True'})
+
+def floor_great(request, id):
+    if request.method == 'POST':
+        floor = Floor.objects.get(id=id)
+        floor.great += 1
+        floor.save()
+
+        obj = FloorGreat.objects.filter(floor=floor, user=request.user).first()
+        if obj:
+            obj.status = True
+            obj.save()
+        else:
+            obj = FloorGreat()
+            obj.floor = floor
+            obj.user = request.user
+            obj.save()
+
+        return JsonResponse({'status': 'True'})
+
+def unfloor_great(request, id):
+    if request.method == 'POST':
+        floor = Floor.objects.get(id=id)
+        floor.great -= 1
+        floor.save()
+
+        obj = FloorGreat.objects.filter(floor=floor, user=request.user).first()
+        obj.status = False
+        obj.save()
+
+        return JsonResponse({'status': 'True'})
+
+def comment_great(request, id):
+    if request.method == 'POST':
+        comment = Comment.objects.get(id=id)
+        comment.great += 1
+        comment.save()
+
+        obj = CommentGreat.objects.filter(comment=comment, user=request.user).first()
+        if obj:
+            obj.status = True
+            obj.save()
+        else:
+            obj = CommentGreat()
+            obj.comment = comment
+            obj.user = request.user
+            obj.save()
+
+        return JsonResponse({'status': 'True'})
+
+def uncomment_great(request, id):
+    if request.method == 'POST':
+        comment = Comment.objects.get(id=id)
+        comment.great -= 1
+        comment.save()
+
+        obj = CommentGreat.objects.filter(comment=comment, user=request.user).first()
+        obj.status = False
+        obj.save()
+
+        return JsonResponse({'status': 'True'})

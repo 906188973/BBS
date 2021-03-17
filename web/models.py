@@ -2,7 +2,7 @@ from django.db import models
 
 # Create your models here.
 class UserInfo(models.Model):
-    """用户"""
+    """用户表"""
     POWER_CHOICES = (
         (1, "普通用户"),
         (2, "版务"),
@@ -22,7 +22,7 @@ class UserInfo(models.Model):
         return self.username
 
 class Forum(models.Model):
-    """版块"""
+    """版块表"""
     forum_name = models.CharField(verbose_name='版块名', max_length=32, db_index=True)
     topic_count = models.IntegerField(default=0)
     concern_count = models.IntegerField(default=0)
@@ -34,7 +34,7 @@ class Forum(models.Model):
         return self.forum_name
 
 class Topic(models.Model):
-    """帖子主题"""
+    """帖子主题表"""
     topic_text = models.CharField(max_length=200)
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
@@ -45,23 +45,25 @@ class Topic(models.Model):
         return self.topic_text
 
 class Floor(models.Model):
-    """楼层"""
+    """楼层表"""
     floor_text = models.TextField()
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     floor_number = models.IntegerField()
     date_added = models.DateTimeField(auto_now_add=True)
+    great = models.IntegerField(default=0)
 
     def __str__(self):
         return self.floor_text[:50] + '...'
 
 class Comment(models.Model):
-    """帖子回复"""
+    """帖子回复表"""
     text = models.TextField(max_length=200)
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, related_name="comments", on_delete=models.DO_NOTHING)
     by_owner = models.ForeignKey(UserInfo, null=True, related_name="replies", on_delete=models.DO_NOTHING)
     date_added = models.DateTimeField(auto_now_add=True)
+    great = models.IntegerField(default=0)
 
     def __str__(self):
         return self.text[:50] + '...'
@@ -82,4 +84,16 @@ class ForumPower(models.Model):
     """版块权限表"""
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     forum = models.ForeignKey(Forum, null=True, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+
+class FloorGreat(models.Model):
+    """楼层点赞表"""
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
+
+class CommentGreat(models.Model):
+    """回复点赞表"""
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)

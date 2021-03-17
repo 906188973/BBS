@@ -29,4 +29,8 @@ urlpatterns = [
     re_path(r'^uncollect/(?P<id>\d+)/$', bbs.uncollect, name='uncollect'),
     re_path(r'^change_power/(?P<id>\d+)/$', bbs.change_power, name='change_power'),
     re_path(r'^moderator/(?P<id>\d+)/$', bbs.moderator, name='moderator'),
+    re_path(r'^floor_great/(?P<id>\d+)/$', bbs.floor_great, name='floor_great'),
+    re_path(r'^unfloor_great/(?P<id>\d+)/$', bbs.unfloor_great, name='unfloor_great'),
+    re_path(r'^comment_great/(?P<id>\d+)/$', bbs.comment_great, name='comment_great'),
+    re_path(r'^uncomment_great/(?P<id>\d+)/$', bbs.uncomment_great, name='uncomment_great'),
 ]

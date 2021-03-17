@@ -95,8 +95,9 @@ img.logo1{
             <a href="{% url 'web:topic' floor.topic.id %}">{{ floor.topic.forum }} :
                 {{ floor.topic }} : {{ floor }} ({{ floor.date_added|date:'Y-m-d H:i' }})</a>
         </div>
+        {% endfor %}
     </div>
-    {% endfor %}
+    
 </div>    
 {% endblock %}
 
