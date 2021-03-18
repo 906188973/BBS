@@ -16,6 +16,7 @@ class BootStrapForm():
             field.widget.attrs['placeholder'] = '请输入{}'.format(field.label)
 
 class RegisterModelForm(BootStrapForm, forms.ModelForm):
+    """注册表单"""
     password = forms.CharField(
         label='密码',
         min_length=8,
@@ -89,6 +90,7 @@ class RegisterModelForm(BootStrapForm, forms.ModelForm):
         return code
 
 class SendSmsForm(forms.Form):
+    """短信表单"""
     mobile_phone = forms.CharField(label='手机号', validators=[RegexValidator(
         r'^(1[3|4|5|6|7|8|9])\d{9}$', '手机号格式错误'), ])
     
@@ -129,6 +131,7 @@ class SendSmsForm(forms.Form):
         return mobile_phone
 
 class LoginSMSForm(BootStrapForm, forms.Form):
+    """登录短信表单"""
     mobile_phone = forms.CharField(label='手机号', validators=[RegexValidator(
         r'^(1[3|4|5|6|7|8|9])\d{9}$', '手机号格式错误'), ])
     code = forms.CharField(label='验证码')
@@ -154,6 +157,7 @@ class LoginSMSForm(BootStrapForm, forms.Form):
         return code
 
 class LoginForm(BootStrapForm, forms.Form):
+    """登录表单"""
     username = forms.CharField(label='邮箱或手机号')
     password = forms.CharField(label='密码', widget=forms.PasswordInput(render_value=True))
     code = forms.CharField(label='图片验证器')

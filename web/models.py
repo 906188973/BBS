@@ -40,6 +40,8 @@ class Topic(models.Model):
     owner = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     floor_count = models.IntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
+    top = models.BooleanField(default=False)
+    refined = models.BooleanField(default=False)
 
     def __str__(self):
         return self.topic_text

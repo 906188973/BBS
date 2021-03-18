@@ -29,75 +29,74 @@
     padding-left: 10px;
     padding-top: 10px;
   }
+  .top{
+    float: left;
+    color: red;
+    padding-right: 5px;
+    pointer-events: none;
+  }
+  .refined{
+    border: 2px solid black;
+    color: black;
+    pointer-events: none;
+    padding: 1px;
+  }
   </style>
 {% endblock %}
 
 
 {% block content %}
 <div class="content">
-    <div style="padding-bottom: 5px;">
-      <div >
-        <img class="logo1"  src='{{ forum.picture.url }}' style="float: left;">
-      </div>
-      <div style="height: 150px; width: 1000px; "> 
-        <h1 style="padding-left: 160px;">{{ forum.forum_name }}</h1>
-        <h4 style="float: left;padding-left: 10px;">发帖数： {{ forum.topic_count }}</h4>
-        <h4 style="float: left;padding-left: 50px;">关注数： {{ forum.concern_count }}</h4>
-        {% if  forum.id in user_forum %}
-        <a style="float: right;" id='concerned_{{ forum.id }}' href="javascript:unConcerned({{ forum.id }});">取消关注</a>
-        {% else %}
-        <a style="float: right;" id='concerned_{{ forum.id }}' href="javascript:Concerned({{ forum.id }});">关注</a>
+  <div style="padding-bottom: 5px;">
+    <div>
+      <img class="logo1"  src='{{ forum.picture.url }}' style="float: left;">
+    </div>
+    <div style="height: 150px; width: 1000px; "> 
+      <h1 style="padding-left: 160px;">{{ forum.forum_name }}</h1>
+      <h4 style="float: left;padding-left: 10px;">发帖数： {{ forum.topic_count }}</h4>
+      <h4 style="float: left;padding-left: 50px;">关注数： {{ forum.concern_count }}</h4>
+      {% if  forum.id in user_forum %}
+      <a style="float: right;" id='concerned_{{ forum.id }}' href="javascript:unConcerned({{ forum.id }});">取消关注</a>
+      {% else %}
+      <a style="float: right;" id='concerned_{{ forum.id }}' href="javascript:Concerned({{ forum.id }});">关注</a>
+      {% endif %}
+    </div> 
+  </div>
+  <div class="topics">
+    <ul class="nr_tz">
+      {% for topic in topics %}
+      <li style="list-style: none;">
+        {% if topic.top %}
+        <a class="top"><i class="fa fa-fire fa-lg"></i></a>
         {% endif %}
-      </div> 
+        <div style="padding-left: 30px;">
+          <div class="hot_number">{{ topic.floor_count }}</div>
+          <a href="{% url 'web:topic' topic.id %}" style="padding-left: 10px;">{{ topic }}</a>
+          <div style="float: right;padding-right: 30px;">
+            {% if topic.refined %}
+            <a class="refined">精</a>
+            {% endif %}
+            <i class="fa fa-user-o" ></i><a href="{% url 'web:other' topic.owner.id %}"> {{ topic.owner }}</a>
+          </div>
+        </div>
+        </li>
+        {% empty %}
+      <li>没有帖子请创建</li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div style="padding-top: 5px;">
+    <div class="form">
+      <h5>发表新贴</h5>
+      <form action="{% url 'web:forum' forum.id %}" method="post">
+        {% csrf_token %}
+        {{ form_topic.as_p }}
+        <br>
+        {{ form_floor.as_p }}
+        <button name="submit">发表</button>
+      </form>
     </div>
-    <div class="topics">
-      <ul class="nr_tz">
-          {% for topic in topics %}
-          <li style="list-style: none;">
-              <div class="hot_number">{{ topic.floor_count }}</div>
-              <a href="{% url 'web:topic' topic.id %}" style="padding-left: 10px;">{{ topic }}</a>
-              <div style="float: right;padding-right: 30px;">
-                <i class="fa fa-user-o" ></i><a href="{% url 'web:other' topic.owner.id %}"> {{ topic.owner }}</a>
-              </div>
-          </li>
-          {% empty %}
-          <li>没有帖子请创建</li>
-          {% endfor %}
-      </ul>
-    </div>
-    <div style="padding-top: 5px;">
-      <div class="form">
-        <h5>发表新贴</h5>
-        <form action="{% url 'web:forum' forum.id %}" method="post">
-            {% csrf_token %}
-            {{ form_topic.as_p }}
-            <br>
-            {{ form_floor.as_p }}
-            <button name="submit">发表</button>
-        </form>
-      </div>
-    </div>
-    <div style="position: relative; left: 373px;">
-        <nav aria-label="Page navigation" >
-          <ul class="pagination" >
-            <li>
-              <a href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
-              </a>
-            </li>
-            <li><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li>
-              <a href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-    </div>
+  </div>
 </div>
 {% endblock content %}
 

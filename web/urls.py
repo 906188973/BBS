@@ -33,4 +33,8 @@ urlpatterns = [
     re_path(r'^unfloor_great/(?P<id>\d+)/$', bbs.unfloor_great, name='unfloor_great'),
     re_path(r'^comment_great/(?P<id>\d+)/$', bbs.comment_great, name='comment_great'),
     re_path(r'^uncomment_great/(?P<id>\d+)/$', bbs.uncomment_great, name='uncomment_great'),
+    path('top/', bbs.top, name='top'),
+    path('untop/', bbs.untop, name='untop'),
+    path('refined/', bbs.refined, name='refined'),
+    path('unrefined/', bbs.unrefined, name='unrefined'),
 ]

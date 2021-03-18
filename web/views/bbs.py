@@ -25,7 +25,7 @@ def create_forum(request):
 def fourm(request, forum_id):
     """显示所有帖子主题"""
     forum = Forum.objects.get(id=forum_id)
-    topics = forum.topic_set.order_by('date_added')
+    topics = forum.topic_set.order_by('-top', 'date_added')
     obj = UserToForum.objects.filter(user=request.user, status=True).all()
 
     user_forum = []
@@ -61,6 +61,17 @@ def fourm(request, forum_id):
     if topics:
         context['topics'] = topics
     return render(request, 'web/topics.html', context)
+
+def topic_del(request, id):
+    """删除帖子"""
+    if request.method == 'POST':
+        topic_id = int(id)
+        obj = Topic.objects.get(id=topic_id)
+        forum = obj.forum
+        forum.topic_count -= 1
+        forum.save()
+        obj.delete()
+        return JsonResponse({'status': 'True'})
 
 def topic(request, topic_id):
     """显示帖子"""
@@ -105,7 +116,19 @@ def topic(request, topic_id):
     context['commentgreat'] = commentgreat
     return render(request, 'web/topic.html', context)
 
+def floor_del(request, id):
+    """删除楼层"""
+    if request.method == 'POST':
+        floor_id = int(id)
+        obj = Floor.objects.get(id=floor_id)
+        topic_obj = obj.topic
+        topic_obj.floor_count = topic_obj.floor_count-1
+        topic_obj.save()
+        obj.delete()
+        return JsonResponse({'status': 'True'})
+
 def update_comment(request):
+    """加评论"""
     data = {}
     if request.method == 'POST':
             user = request.user
@@ -140,33 +163,15 @@ def update_comment(request):
         data['status'] = False
     return JsonResponse(data)
 
-def topic_del(request, id):
-    if request.method == 'POST':
-        topic_id = int(id)
-        obj = Topic.objects.get(id=topic_id)
-        forum = obj.forum
-        forum.topic_count -= 1
-        forum.save()
-        obj.delete()
-        return JsonResponse({'status': 'True'})
-
-def floor_del(request, id):
-    if request.method == 'POST':
-        floor_id = int(id)
-        obj = Floor.objects.get(id=floor_id)
-        topic_obj = obj.topic
-        topic_obj.floor_count = topic_obj.floor_count-1
-        topic_obj.save()
-        obj.delete()
-        return JsonResponse({'status': 'True'})
-
 def comment_del(request, id):
+    """删除评论"""
     if request.method == 'POST':
         comment_id = int(id)
         Comment.objects.get(id=comment_id).delete()
         return JsonResponse({'status': 'True'})
 
 def concerned(request, id):
+    """关注"""
     if request.method == 'POST':
         obj = UserToForum.objects.filter(forum_id=int(id), user=request.user).first()
         if obj:
@@ -189,6 +194,7 @@ def concerned(request, id):
         return JsonResponse({'status': 'True'})
 
 def unconcerned(request, id):
+    """取消关注"""
     if request.method == 'POST':
         forum = Forum.objects.get(id=int(id))
         forum.concern_count -= 1
@@ -200,6 +206,7 @@ def unconcerned(request, id):
         return JsonResponse({'status': 'True'})
 
 def collect(request, id):
+    """收藏"""
     if request.method == 'POST':
         obj = Collect.objects.filter(topic_id=int(id), user=request.user).first()
         if obj:
@@ -215,6 +222,7 @@ def collect(request, id):
         return JsonResponse({'status': 'True'})
 
 def uncollect(request, id):
+    """取消收藏"""
     if request.method == 'POST':
         obj = Collect.objects.filter(topic_id=int(id), user=request.user).first()
         obj.status = False
@@ -223,7 +231,7 @@ def uncollect(request, id):
 
 
 def change_power(request, id):
-
+    """更改权限"""
     if request.method == 'GET':
         if request.user.power == 4:
             forums = Forum.objects.all()
@@ -249,7 +257,7 @@ def change_power(request, id):
     return JsonResponse({'status': 'True'})
 
 def moderator(request, id):
-
+    """设置版主"""
     if request.method == 'GET':
         forums = Forum.objects.all()
         user = UserInfo.objects.get(id=id)
@@ -266,6 +274,7 @@ def moderator(request, id):
     return JsonResponse({'status': 'True'})
 
 def floor_great(request, id):
+    """楼层点赞"""
     if request.method == 'POST':
         floor = Floor.objects.get(id=id)
         floor.great += 1
@@ -284,6 +293,7 @@ def floor_great(request, id):
         return JsonResponse({'status': 'True'})
 
 def unfloor_great(request, id):
+    """取消楼层点赞"""
     if request.method == 'POST':
         floor = Floor.objects.get(id=id)
         floor.great -= 1
@@ -296,6 +306,7 @@ def unfloor_great(request, id):
         return JsonResponse({'status': 'True'})
 
 def comment_great(request, id):
+    """评论点赞"""
     if request.method == 'POST':
         comment = Comment.objects.get(id=id)
         comment.great += 1
@@ -314,6 +325,7 @@ def comment_great(request, id):
         return JsonResponse({'status': 'True'})
 
 def uncomment_great(request, id):
+    """取消评论点赞"""
     if request.method == 'POST':
         comment = Comment.objects.get(id=id)
         comment.great -= 1
@@ -323,4 +335,40 @@ def uncomment_great(request, id):
         obj.status = False
         obj.save()
 
+        return JsonResponse({'status': 'True'})
+
+def top(request):
+    """置顶"""
+    if request.method == 'POST':
+        id = int(request.POST.get('id'))
+        topic = Topic.objects.get(id=id)
+        topic.top = True
+        topic.save()
+        return JsonResponse({'status': 'True'})
+
+def untop(request):
+    """取消置顶"""
+    if request.method == 'POST':
+        id = int(request.POST.get('id'))
+        topic = Topic.objects.get(id=id)
+        topic.top = False
+        topic.save()
+        return JsonResponse({'status': 'True'})
+
+def refined(request):
+    """加精"""
+    if request.method == 'POST':
+        id = int(request.POST.get('id'))
+        topic = Topic.objects.get(id=id)
+        topic.refined = True
+        topic.save()
+        return JsonResponse({'status': 'True'})
+
+def unrefined(request):
+    """取消加精"""
+    if request.method == 'POST':
+        id = int(request.POST.get('id'))
+        topic = Topic.objects.get(id=id)
+        topic.refined = False
+        topic.save()
         return JsonResponse({'status': 'True'})

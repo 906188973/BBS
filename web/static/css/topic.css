@@ -1,0 +1,86 @@
+.head{
+    background-color: rgb(248, 248, 248);
+    padding-bottom: 5px;
+    border: 3px solid rgb(135, 119, 119);
+
+}
+.collect{
+    float: right;
+    position: relative;
+    top:10px
+}
+img.floor_head{
+    width: 80px;
+    height: 80px;
+    border-style: solid;
+    border-color: black;
+    border-width: 4px;
+}
+img.comment_head{
+    width: 40px;
+    height: 40px;
+}
+.nr_tz li {
+    font-size: 16px;
+    background-color: white;
+    padding-top: 5px;
+} 
+.hot_number {
+      height: 23px;
+      width: 40px;
+      text-align: center;
+      float: left;
+      border: 2px solid black;
+}
+.topics{
+    padding-top: 5px; 
+    padding-bottom: 5px;
+    border-top:2px solid black;
+    border-bottom: 2px solid black ;
+}
+.form{
+    height: 320px;
+    width: 800px;
+    margin:0px auto;
+    border: 2px solid black;
+    padding-left: 10px;
+    padding-top: 10px;
+}
+.floorstyle{
+    background-color: rgb(248, 248, 248);
+    margin-right: 54px;
+    border: 3px solid rgb(135, 119, 119);
+}
+.personage {
+    right: 1px;
+    border: 3px solid black;
+    padding-left: 25px;
+    padding-top: 13px;
+    padding-bottom: 10px;
+    width: 200px;
+    height: 200px;
+    float: left;
+}
+.forums{
+    position: relative;
+    left: 1px;
+    margin-left: 200px;
+    border: 3px solid black;
+    padding-bottom: 10px;
+    width: 700px;
+    height: auto;
+}
+.reply{
+    position: relative;
+    left: 50px;
+    display:none;
+    border: 3px solid black;
+    width: 600px;
+    padding-left: 5px;
+    padding-top: 5px;
+}
+.reply_text{
+    resize: none;
+    width: 560px;
+    height: 40px;
+}

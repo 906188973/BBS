@@ -3,138 +3,54 @@
 
 {% block title %}首页{% endblock %}
 {% block css %}
-    <style>
-        .personage {
-            position: relative;
-            right: 2px;
-            border: 2px solid black;
-            padding-left: 25px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            width: 200px;
-            float: left;
-        }
-        .forums{
-            position: relative;
-            left: 2px;
-            border: 2px solid black;
-            padding-bottom: 10px;
-            width: 800px;
-            float: left;
-        }
-        .concerned{
-            padding-left: 5px;
-            border: 2px solid rgb(231, 231, 231);
-            background-color: rgb(248, 248, 248);
-            margin-bottom: 4px;
-            width: 150px;
-            font-size: 16px;
-            color: rgb(135, 119, 119);
-            display:block
-        }
-        .concerned:hover {
-            color: black;
-            text-decoration: none;
-        }
-        .name{
-            color: black;
-            font-size: 30px;
-        }
-        .name:hover {
-            color: rgb(135, 119, 119);
-            text-decoration: underline black;
-        }
-        .forum{
-            float: left;
-            width: 180px;
-            padding-left: 25px;
-            padding-top: 10px;
-        }
-        .add{
-            position: relative;
-            top: 10px;
-            left: 16px;
-            color: black;
-        }
-    </style>
+  <link rel="stylesheet" href="{% static 'css/home.css' %}">
 {% endblock %}
 
 {% block content %}
-    <div class="content">
-        <div class="personage">
-            <div class='logo'>
-                {% if request.user.head_portrait %}
-                <img class='logo1' src='{{ request.user.head_portrait.url }}'>
-                {% else %}
-                <img class='logo1' src="{% static 'img/default.jpg' %}">
-                {% endif %}
-            </div>
-            <div><a class="name" href="{% url 'web:account' %}">{{ request.user.username }}</a></div>
-            <h4>你关注的版块</h4>
-            {% for concerned in request.user.usertoforum_set.all %}
-            {% if concerned.status == 1 %}
-            <div id="user_concerned_{{ concerned.forum.id }}" >
-                <a class="concerned" href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
-            </div>
-            {% endif %}
-            {% endfor %}
-        </div>
-        <div class="forums">
-            {% for forum in forums %}
-            <div class="forum">
-                <a href="{% url 'web:forum' forum.id%}">
-                    <img style="height: 150px; width: 150px;" src='{{ forum.picture.url }}'>
-                </a>
-                <a href="{% url 'web:forum' forum.id%}" style="color: black;">{{ forum.forum_name }}</a>
-                {% if  forum.id in user_forum %}
-                <a style="float: right; color: black;" id='concerned_{{ forum.id }}' href="javascript:unConcerned({{ forum.id }});">取消关注</a>
-                {% else %}
-                <a style="float: right; color: black;" id='concerned_{{ forum.id }}' href="javascript:Concerned({{ forum.id }});">关注</a>
-                {% endif %}
-                <div>
-                    <i class="fa fa-user"></i>  {{ forum.concern_count }}
-                    <div style="float: right;"><i class="fa fa-list" ></i>  {{ forum.topic_count }}</div>
-                </div>
-            </div>
-            {% endfor%}
-            <div>
-                <a href="{% url 'web:create_forum' %}" class="add"><i class="fa fa-plus-square-o fa-4x" ></i></a>
-            </div>
-        </div>
+  <div class="content">
+    <div class="personage">
+      <div class='logo'>
+        {% if request.user.head_portrait %}
+        <img class='logo1' src='{{ request.user.head_portrait.url }}'>
+        {% else %}
+        <img class='logo1' src="{% static 'img/default.jpg' %}">
+        {% endif %}
+      </div>
+      <div><a class="name" href="{% url 'web:account' %}">{{ request.user.username }}</a></div>
+      <h4>你关注的版块</h4>
+      {% for concerned in request.user.usertoforum_set.all %}
+      {% if concerned.status == 1 %}
+      <div id="user_concerned_{{ concerned.forum.id }}" >
+        <a class="concerned" href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
+      </div>
+      {% endif %}
+      {% endfor %}
     </div>
+    <div class="forums">
+      {% for forum in forums %}
+      <div class="forum">
+        <a href="{% url 'web:forum' forum.id%}">
+          <img style="height: 150px; width: 150px;" src='{{ forum.picture.url }}'>
+        </a>
+        <a href="{% url 'web:forum' forum.id%}" style="color: black;">{{ forum.forum_name }}</a>
+        {% if  forum.id in user_forum %}
+        <a  id='concerned_{{ forum.id }}' class="aconcerned" href="javascript:unConcerned({{ forum.id }});">取消关注</a>
+        {% else %}
+        <a  id='concerned_{{ forum.id }}' class="aconcerned" href="javascript:Concerned({{ forum.id }});">关注</a>
+        {% endif %}
+        <div>
+          <i class="fa fa-user"></i>  {{ forum.concern_count }}
+          <div style="float: right;"><i class="fa fa-list" ></i>  {{ forum.topic_count }}</div>
+        </div>
+      </div>
+      {% endfor%}
+      <div>
+        <a href="{% url 'web:create_forum' %}" class="add"><i class="fa fa-plus-square-o fa-4x" ></i></a>
+      </div>
+    </div>
+  </div>
 {% endblock %}
 
 {% block js %}
-    <script>
-        function Concerned(id) {
-            var pk = id
-            var url = '/concerned/' + pk + '/'
-            $.ajax({
-                url: url,
-                type: "POST",
-                success: function (res) {
-                    if(res.status){
-                    $('#concerned_'+id).text("取消关注");
-                    var script = 'javascript:unConcerned(' + pk + ');'
-                    }
-                }
-            })
-        }
-        function unConcerned(id) {
-            var pk = id
-            var url = '/unconcerned/' + pk + '/'
-            $.ajax({
-                url: url,
-                type: "POST",
-                success: function (res) {
-                    if(res.status){
-                    $('#concerned_'+id).text("关注");
-                    var script = 'javascript:Concerned(' + pk + ');'
-                    $('#concerned_'+id).attr("href",script);
-                    $('#user_concerned_'+id).remove();
-                    }
-                }
-            })
-        }
-    </script>
+  <script src="{% static 'js/home.js' %}"></script>
 {% endblock %}

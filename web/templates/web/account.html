@@ -1,152 +1,111 @@
 {% extends 'layout/basic.html' %}
 {% load static %}
 
-{% block title %}个人详情页{% endblock %}
+{% block title %}{{ request.user.username }}个人详情页{% endblock %}
+
 {% block css %}
 <style>
-    .personage {
-            position: relative;
-            right: 2px;
-            border: 2px solid black;
-            padding-left: 25px;
-            padding-top: 10px;
-            padding-bottom: 10px;
-            width: 200px;
-            float: left;
-        }
-        .forums{
-            position: relative;
-            left: 2px;
-            border: 2px solid black;
-            padding-bottom: 10px;
-            padding-left: 10px;
-            width: 800px;
-            float: left;
-        }
-    .logo{
+  .personage {
+    position: relative;
+    right: 2px;
+    border: 2px solid black;
+    padding-left: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 200px;
+    float: left;
+  }
+  .forums{
+    position: relative;
+    left: 2px;
+    border: 2px solid black;
+    padding-bottom: 10px;
+    padding-left: 10px;
+    width: 800px;
+    float: left;
+  }
+  .logo{
     width: 150px;
     height: 150px;
     }
-img.logo1{
+  img.logo1{
     width: 150px;
     height: 150px;
     border-style: solid;
     border-color: black;
     border-width: 4px;
-    }
+  } 
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="content">
-    <div class="personage">
-        <div class='logo'>
-            {% if request.user.head_portrait %}
-            <img class='logo1' src='{{ request.user.head_portrait.url }}'>
-            {% else %}
-            <img class='logo1' src="{% static 'img/default.jpg' %}">
-            {% endif %}
-        </div>
-        <a href="{% url 'web:headupload' %}">修改头像</a>
-        <h1>{{ request.user.username }}</h1>
-        <h5>个性签名：</h5>
-        {% if request.user.describe %}
-        <p style="width: 150px;">{{ request.user.describe }}</p>
-        {% else %}
-        <p>这个人很懒什么也没留下</p>
-        {% endif %}
-        <a >修改个性签名</a>
+  <div class="personage">
+    <div class='logo'>
+      {% if request.user.head_portrait %}
+      <img class='logo1' src='{{ request.user.head_portrait.url }}'>
+      {% else %}
+      <img class='logo1' src="{% static 'img/default.jpg' %}">
+      {% endif %}
     </div>
-    <div class="forums">
-        <h4>管理的版块</h4>
-        {% for forum in request.user.forum_set.all %}
-        <div>
-            <a href="{% url 'web:forum' forum.id %}">{{ forum }} ({{ forum.date_added|date:'Y-m-d H:i' }})</a>
-        </div>
-        {% endfor %}
-        <h4>你关注的版块</h4>
-        {% for concerned in request.user.usertoforum_set.all %}
-        {% if concerned.status == 1 %}
-        <div id='concerned_{{ concerned.forum.id }}'>
-            <a  href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
-            <a  href="javascript:unConcerned({{ concerned.forum.id }});">取消关注</a>
-        </div>
-        {% endif %}
-        {% endfor %}
-        <h4>你收藏的版块</h4>
-        {% for collect in request.user.collect_set.all %}
-        {% if collect.status == 1 %}
-        <div id='collect_{{ collect.topic.id }}'>
-            <a  href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
-            <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
-        </div>
-        {% endif %}
-        {% endfor %}
-        <h4>你发起的帖子</h4>
-        {% for topic in request.user.topic_set.all %}
-        <div id='topic_{{ topic.id }}'>
-            <a href="{% url 'web:topic' topic.id %}">{{ topic.forum }} : {{ topic }} ({{ topic.date_added|date:'Y-m-d H:i' }})</a>
-            <a href="javascript:topicDel({{ topic.id }});"> 删除</a>
-        </div>
-        {% endfor %}
-        <h4>你发出的楼层</h4>
-        {% for floor in request.user.floor_set.all %}
-        <div>
-            <a href="{% url 'web:topic' floor.topic.id %}">{{ floor.topic.forum }} :
-                {{ floor.topic }} : {{ floor }} ({{ floor.date_added|date:'Y-m-d H:i' }})</a>
-        </div>
-        {% endfor %}
+    <a href="{% url 'web:headupload' %}">修改头像</a>
+    <h1>{{ request.user.username }}</h1>
+    <h5>个性签名：</h5>
+    {% if request.user.describe %}
+    <p style="width: 150px;">{{ request.user.describe }}</p>
+    {% else %}
+    <p>这个人很懒什么也没留下</p>
+    {% endif %}
+    <a >修改个性签名</a>
+  </div>
+  <div class="forums">
+    <h4>管理的版块</h4>
+    {% for forum in request.user.forum_set.all %}
+    <div>
+      <a href="{% url 'web:forum' forum.id %}">{{ forum }} ({{ forum.date_added|date:'Y-m-d H:i' }})</a>
     </div>
-    
+    {% endfor %}
+    <h4>你关注的版块</h4>
+    {% for concerned in request.user.usertoforum_set.all %}
+    {% if concerned.status == 1 %}
+    <div id='concerned_{{ concerned.forum.id }}'>
+      <a  href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
+      <a  href="javascript:unConcerned({{ concerned.forum.id }});">取消关注</a>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <h4>你收藏的版块</h4>
+    {% for collect in request.user.collect_set.all %}
+    {% if collect.status == 1 %}
+    <div id='collect_{{ collect.topic.id }}'>
+      <a  href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
+      <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
+    </div>
+    {% endif %}
+    {% endfor %}
+    <h4>你发起的帖子</h4>
+    {% for topic in request.user.topic_set.all %}
+    <div id='topic_{{ topic.id }}'>
+      <a href="{% url 'web:topic' topic.id %}">{{ topic.forum }} : {{ topic }} ({{ topic.date_added|date:'Y-m-d H:i' }})</a>
+      <a href="javascript:topicDel({{ topic.id }});"> 删除</a>
+    </div>
+    {% endfor %}
+    <h4>你发出的楼层</h4>
+    {% for floor in request.user.floor_set.all %}
+    <div>
+      <a href="{% url 'web:topic' floor.topic.id %}">{{ floor.topic.forum }} :
+        {{ floor.topic }} : {{ floor }} ({{ floor.date_added|date:'Y-m-d H:i' }})</a>
+    </div>
+    {% endfor %}
+  </div>  
 </div>    
 {% endblock %}
 
 {% block js %}
     <script>
-        $.ajaxSetup({
-            data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
-        })
-        function topicDel(id) {
-            var flag = confirm("您确定要删除您的回复吗？")
-            if (flag) {
-                var pk = id
-                var url = '/topic_del/' + pk + '/'
-                $.ajax({
-                    url: url,
-                    type: "POST",
-                    success: function (res) {
-                        if(res.status){
-                        $('#topic_'+id).remove();
-                        }
-                    }
-                })
-            }
-        }
-         function unConcerned(id) {
-            var pk = id
-            var url = '/unconcerned/' + pk + '/'
-            $.ajax({
-                url: url,
-                type: "POST",
-                success: function (res) {
-                    if(res.status){
-                    $('#concerned_'+id).remove();
-                    }
-                }
-            })
-        }
-        function unCollect(id) {
-            var pk = id
-            var url = '/uncollect/' + pk + '/'
-            $.ajax({
-                url: url,
-                type: "POST",
-                success: function (res) {
-                    if(res.status){
-                    $('#collect_'+id).remove();
-                    }
-                }
-            })
-        }
+      $.ajaxSetup({
+        data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
+      })
     </script>
+    <script src="{% static 'js/account.js' %}"></script>
 {% endblock %}

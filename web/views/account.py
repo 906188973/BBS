@@ -87,13 +87,16 @@ def image_code(request):
     return HttpResponse(stream.getvalue())
 
 def logout(request):
+    """退出"""
     request.session.flush()
     return redirect('web:home')
 
 def account(request):
+    """个人页"""
     return render(request, 'web/account.html')
 
 def headupload(request):
+    """更新头像"""
     if request.method == 'POST':
         # 取出文件后缀名,这里前端给我传的文件key为`文件`,大部分默认文件key为`file`
         fmt = str(request.FILES.get('head_portrait').name).split('.')[-1]
@@ -113,6 +116,7 @@ def headupload(request):
     return render(request, 'web/headupload.html', context)
 
 def other(request, id):
+    """他人个人页"""
     user = models.UserInfo.objects.get(id=id)
     context = {'user': user}
     return render(request, 'web/other.html', context)
