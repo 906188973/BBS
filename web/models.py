@@ -29,6 +29,7 @@ class Forum(models.Model):
     date_added = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     moderator = models.ForeignKey(UserInfo, null=True, on_delete=models.SET_NULL)
     picture = models.ImageField(verbose_name='图片', null=True, upload_to='picture/')
+    background = models.ImageField(verbose_name='背景图片', null=True, upload_to='background/')
 
     def __str__(self):
         return self.forum_name
@@ -44,7 +45,9 @@ class Topic(models.Model):
     refined = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.topic_text
+        if len(self.topic_text) > 36:
+            return self.topic_text[:36] + '...'
+        return self.topic_text[:36]
 
 class Floor(models.Model):
     """楼层表"""
@@ -56,7 +59,9 @@ class Floor(models.Model):
     great = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.floor_text[:50] + '...'
+        if len(self.floor_text) > 199:
+            return self.floor_text[:199] + '...'
+        return self.floor_text[:199]
 
 class Comment(models.Model):
     """帖子回复表"""
@@ -68,7 +73,7 @@ class Comment(models.Model):
     great = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.text[:50] + '...'
+        return self.text
 
 class UserToForum(models.Model):
     """用户关注模块表"""

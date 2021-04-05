@@ -17,37 +17,114 @@
         {% endif %}
       </div>
       <div><a class="name" href="{% url 'web:account' %}">{{ request.user.username }}</a></div>
-      <h4>你关注的版块</h4>
-      {% for concerned in request.user.usertoforum_set.all %}
-      {% if concerned.status == 1 %}
-      <div id="user_concerned_{{ concerned.forum.id }}" >
-        <a class="concerned" href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
-      </div>
-      {% endif %}
-      {% endfor %}
+      <ul class="tagul"> 
+        <li class="tag"><a class="taga" onclick="switchtag('hottopic')">热门帖子</a></li>
+        <li class="tag"><a class="taga" onclick="switchtag('allforum')">全部版块</a></li>
+        <li class="tag"><a class="taga" onclick="switchtag('concernedforum')">你关注的版块</a></li>
+        <li class="tag"><a class="taga" onclick="switchtag('collecttopic')">你收藏的帖子</a></li>
+        <li class="tag"><a class="taga" onclick="switchtag('concernedown')">你关注的用户</a></li>
+      </ul>
     </div>
+    
     <div class="forums">
-      {% for forum in forums %}
-      <div class="forum">
-        <a href="{% url 'web:forum' forum.id%}">
-          <img style="height: 150px; width: 150px;" src='{{ forum.picture.url }}'>
-        </a>
-        <a href="{% url 'web:forum' forum.id%}" style="color: black;">{{ forum.forum_name }}</a>
-        {% if  forum.id in user_forum %}
-        <a  id='concerned_{{ forum.id }}' class="aconcerned" href="javascript:unConcerned({{ forum.id }});">取消关注</a>
-        {% else %}
-        <a  id='concerned_{{ forum.id }}' class="aconcerned" href="javascript:Concerned({{ forum.id }});">关注</a>
-        {% endif %}
-        <div>
-          <i class="fa fa-user"></i>  {{ forum.concern_count }}
-          <div style="float: right;"><i class="fa fa-list" ></i>  {{ forum.topic_count }}</div>
-        </div>
+      <div class="divforums" id="hottopic" style="display: block;">
+        <h1 style="color: rgb(52,92,161);"><b>热门帖子</b></h1>
+        <ul>
+          {% for topic in hottopic %}
+          <li>
+            <div class="hottopic">
+              <a href="{% url 'web:topic' topic.id %}">{{ topic }}</a>
+              <p>{{ topic.floor_set.first }}</p>
+              <p>
+                <i class="fa fa-user"></i> 
+                <a href="{% url 'web:other' topic.floor_set.first.owner.id%}">{{ topic.floor_set.first.owner }}</a> / 
+                <a href="{% url 'web:forum' topic.forum.id%}">{{ topic.forum }}</a>
+              </p> 
+            </div>
+          </li>
+          {% endfor%}
+        </ul>
       </div>
-      {% endfor%}
-      <div>
-        <a href="{% url 'web:create_forum' %}" class="add"><i class="fa fa-plus-square-o fa-4x" ></i></a>
+      <div class="divforums" id="allforum">
+        <h1 style="color: rgb(52,92,161);"><b>全部版块</b></h1>
+        {% for forum in forums %}
+        <div class="forum">
+          <a href="{% url 'web:forum' forum.id%}" class="forumimg">
+            <img style="height: 150px; width: 150px;" src='{{ forum.picture.url }}'>
+          </a>
+          <a href="{% url 'web:forum' forum.id%}" >{{ forum.forum_name }}</a>
+          {% if  forum.id in user_forum %}
+          <a  id='concerned_{{ forum.id }}' class="aconcerned" href="javascript:unConcerned({{ forum.id }});">取消关注</a>
+          {% else %}
+          <a  id='concerned_{{ forum.id }}' class="aconcerned" href="javascript:Concerned({{ forum.id }});">关注</a>
+          {% endif %}
+          <div>
+            <i class="fa fa-user"></i>  {{ forum.concern_count }}
+            <div style="float: right;"><i class="fa fa-list" ></i>  {{ forum.topic_count }}</div>
+          </div>
+        </div>
+        {% endfor%}
+      </div>
+      <div class="divforums" id="concernedforum">
+        <h1 style="color: rgb(52,92,161);"><b>你关注的版块</b></h1>
+        {% for concerned in request.user.usertoforum_set.all %}
+        {% if concerned.status == 1 %}
+        <div class="forum">
+          <a href="{% url 'web:forum' concerned.forum.id%}" class="forumimg">
+            <img style="height: 150px; width: 150px;" src='{{ concerned.forum.picture.url }}'>
+          </a>
+          <a href="{% url 'web:forum' concerned.forum.id%}" >{{ concerned.forum.forum_name }}</a>
+          <a  id='concerned_{{ concerned.forum.id }}' class="aconcerned" href="javascript:unConcerned({{ concerned.forum.id }});">取消关注</a>
+          <div>
+            <i class="fa fa-user"></i>  {{ concerned.forum.concern_count }}
+            <div style="float: right;"><i class="fa fa-list" ></i>  {{ concerned.forum.topic_count }}</div>
+          </div>
+        </div>
+        {% endif %}
+        {% endfor%}
+      </div>
+      <div class="divforums" id="collecttopic">
+        <h1 style="color: rgb(52,92,161);"><b>你收藏的帖子</b></h1>
+        {% for collect in request.user.collect_set.all %}
+        {% if collect.status == 1 %}
+        <div id='collect_{{ collect.topic.id }}'>
+          <a  href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
+          <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
+      <div class="divforums" id="concernedown">
+        <h1 style="color: rgb(52,92,161);"><b>你关注的用户</b></h1>
+        {% for collect in request.user.collect_set.all %}
+        {% if collect.status == 1 %}
+        <div id='collect_{{ collect.topic.id }}'>
+          <a  href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
+          <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
+        </div>
+        {% endif %}
+        {% endfor %}
       </div>
     </div>
+    
+  </div>
+  <div style="height: 110px;position: fixed;top:75%;right: 10%;">
+    <ul >
+      <li style="padding-bottom: 10px">
+        <div style="background-color: rgb(52,92,161);width: 50px;height: 50px;">
+          <a href="{% url 'web:create_forum' %}" >
+            <i class="fa fa-plus-square-o fa-3x" style="color: rgb(234,240,251);position: relative;left:8px ;top:7px"></i>
+          </a>
+        </div>
+      </li>
+      <li >
+        <div style="background-color: rgb(52,92,161);width: 50px;height: 50px;">
+          <a href="javascript:void(0)" onclick="goto_top()">
+            <i class="fa fa-chevron-up fa-2x" style="color: rgb(234,240,251);position: relative;left:11px ;top:10px"></i>
+          </a>
+        </div>
+      </li>
+    </ul>
   </div>
 {% endblock %}
 

@@ -7,7 +7,7 @@ class ForumForm(forms.ModelForm):
 
     class Meta:
         model = Forum
-        fields = ['forum_name', 'picture']
+        fields = ['forum_name', 'picture', 'background']
 
     def clean_forum_name(self):
         forum_name = self.cleaned_data['forum_name']

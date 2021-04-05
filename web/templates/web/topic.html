@@ -9,7 +9,7 @@
 {% block content %}
 <div class="content">
   <div class="head">
-    <h1 style=" width: 800px;">{{ topic }}</h1>
+    <h1 style=" padding-left: 10px;">{{ topic }}</h1>
 		<div class="collect">
 			{% if topic.forum.moderator == request.user %}
 				{% if topic.top %}
@@ -32,7 +32,7 @@
   </div>
   <div style="width: 1000px;padding-top: 20px;">
     <ul style="list-style-type: none;">
-      {% for floor in floors %}
+      {% for floor in floors_page %}
       <li id="floor_{{ floor.id }}"  style="padding-top: 10px;">
 				<div class="floorstyle">
 					<div class="personage">
@@ -118,6 +118,115 @@
       {% endfor %}
     </ul>
   </div>
+  <div style="position: relative;left: 340px;">
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        {% if floors_page.number > 1 %}
+        <li>
+          <a href="?page={{ floors_page.previous_page_number }}" aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        {% endif %}
+        {% if floors_page.paginator.num_pages == 1 %}
+        <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+        {% endif %}
+        {% if floors_page.paginator.num_pages == 2 %}
+          {% if floors_page.number == 1 %}
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          {% elif floors_page.number == 2 %}
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if floors_page.paginator.num_pages == 3 %}
+          {% if floors_page.number == 1 %}
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:2 }}">{{ floors_page.number|add:2 }}</a></li>
+          {% elif floors_page.number == 2 %}
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          {% elif floors_page.number == 3 %}
+          <li><a href="?page={{ floors_page.number|add:-2 }}">{{ floors_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if floors_page.paginator.num_pages == 4 %}  
+          {% if floors_page.number == 1 %}
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:2 }}">{{ floors_page.number|add:2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:3 }}">{{ floors_page.number|add:3 }}</a></li>
+          {% elif floors_page.number == 2 %}
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:2 }}">{{ floors_page.number|add:2 }}</a></li>
+          {% elif floors_page.number == 3 %}
+          <li><a href="?page={{ floors_page.number|add:-2 }}">{{ floors_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          {% elif floors_page.number == 4 %}
+          <li><a href="?page={{ floors_page.number|add:-3 }}">{{ floors_page.number|add:-3 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-2 }}">{{ floors_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if floors_page.paginator.num_pages >= 5 %}  
+          {% if floors_page.number == 1 %}
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:2 }}">{{ floors_page.number|add:2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:3 }}">{{ floors_page.number|add:3 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:4 }}">{{ floors_page.number|add:4 }}</a></li>
+          {% elif floors_page.number == 2 %}
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:2 }}">{{ floors_page.number|add:2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:3 }}">{{ floors_page.number|add:3 }}</a></li>
+          {% elif floors_page.number|add:1 == floors_page.paginator.num_pages %}
+          <li><a href="?page={{ floors_page.number|add:-3 }}">{{ floors_page.number|add:-3 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-2 }}">{{ floors_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          {% elif floors_page.number == floors_page.paginator.num_pages %}
+          <li><a href="?page={{ floors_page.number|add:-4 }}">{{ floors_page.number|add:-4 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-3 }}">{{ floors_page.number|add:-3 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-2 }}">{{ floors_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          {% else %}
+          <li><a href="?page={{ floors_page.number|add:-2 }}">{{ floors_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:-1 }}">{{ floors_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ floors_page.number }}" style="background-color: rgb(238,238,238);">{{ floors_page.number }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:1 }}">{{ floors_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ floors_page.number|add:2 }}">{{ floors_page.number|add:2 }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if floors_page.number < floors_page.paginator.num_pages %}
+        <li>
+          <a href="?page={{ floors_page.next_page_number }}" aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        {% endif %}
+        <li style="padding-left: 10px;position: relative;top:4px;">
+          跳转至<input type="text" id="pageNum" size="1">页
+          <button type="button" class="btn btn-default btn-sm" onclick="getPage();">
+              <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
   <div style="padding-top: 5px;">
       <div class="form">
         <p>发表回复</p>
@@ -143,6 +252,15 @@
     $("#topic").show();
     $("#topic").text("{{ topic.topic_text|slice:':10' }}");
     $("#topic").attr("href","{% url 'web:topic' topic.id %}");
+	function getPage() {
+        var pageNum = $('#pageNum').val();
+        if(pageNum >= 1 && pageNum <= {{ floors_page.paginator.num_pages }}){
+            location.assign("{% url 'web:topic' topic.id %}?page="+pageNum);
+        }
+        else{
+            alert('请输入正确的页码!');
+        }
+      }
   </script>
   <script src="{% static 'js/topic.js' %}"></script>
 {% endblock %}

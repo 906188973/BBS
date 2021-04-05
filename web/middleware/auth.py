@@ -11,7 +11,7 @@ class AuthMiddleware(MiddlewareMixin):
         user_object = models.UserInfo.objects.filter(id=user_id).first()
         request.user = user_object
 
-        if request.path_info in settings.WHITE_REGEX_URL_LIST:
-            return
-        if not request.user:
-            return redirect('web:login')
+        # if request.path_info in settings.WHITE_REGEX_URL_LIST:
+        #     return
+        # if not request.user:
+        #     return redirect('web:login')

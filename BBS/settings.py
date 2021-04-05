@@ -139,6 +139,7 @@ WHITE_REGEX_URL_LIST = [
     "/login/",
     "/image/code/",
     "/",
+    ""
 ]
 
 # 图片储存根路径
