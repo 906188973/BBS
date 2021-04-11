@@ -152,13 +152,18 @@
       {% endfor %}
     </ul>
   </div>
-  <div style="position: relative;left: 340px;top:-71px">
+  <div style="position: relative;left: 300px;top:-71px">
     <nav aria-label="Page navigation">
       <ul class="pagination">
         {% if topic_page.number > 1 %}
         <li>
+          <a href="?page=1" aria-label="Previous">
+            <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li>
           <a href="?page={{ topic_page.previous_page_number }}" aria-label="Previous">
-            <span aria-hidden="true">&laquo;</span>
+            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
           </a>
         </li>
         {% endif %}
@@ -248,11 +253,17 @@
         {% if topic_page.number < topic_page.paginator.num_pages %}
         <li>
           <a href="?page={{ topic_page.next_page_number }}" aria-label="Next">
-            <span aria-hidden="true">&raquo;</span>
+            <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li>
+          <a href="?page={{ topic_page.paginator.num_pages }}" aria-label="Next">
+            <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
           </a>
         </li>
         {% endif %}
         <li style="padding-left: 10px;position: relative;top:4px;">
+          共{{ topic_page.paginator.num_pages }}页，
           跳转至<input type="text" id="pageNum" size="1">页
           <button type="button" class="btn btn-default btn-sm" onclick="getPage();">
               <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
@@ -260,10 +271,13 @@
         </li>
       </ul>
     </nav>
+    <div style="position:relative; left:100px;top:-10px;">
+      共有主题数 <span style="color: rgb(52,92,161);">{{ forum.topic_count }}</span> 个，
+      贴子数 <span style="color: rgb(52,92,161);">{{ topic_count }}</span> 篇
+    </div>
   </div>
   <div style="padding-top: 5px;position: relative;top:-80px">
     <div class="form">
-      <a name="form"></a>
       <h5>发表新贴</h5>
       <form action="{% url 'web:forum' forum.id %}" method="post">
         {% csrf_token %}
@@ -271,6 +285,7 @@
         <br>
         {{ form_floor.as_p }}
         <button name="submit">发表</button>
+        <a name="form"></a>
       </form>
     </div>
   </div>

@@ -30,18 +30,23 @@ function reply(replyid, floorid){
         $('#comment_name_'+floorid).text(name);
 }
 function replyShow(id){
-        $("#reply_form_"+id).toggle(function(){
-            if ($('#replyshow'+id).text() == '回复'){
-                $('#replyshow'+id).text('收起回复');
+        $("#reply_list_"+id).toggle(function(){
+            if ($('#replyshow'+id).text() == '收起回复'){
+                $('#replyshow'+id).text('回复');
             }
             else{
-                $('#replyshow'+id).text('回复');
+                $('#replyshow'+id).text('收起回复');
             }
 		});
         $('.comment_id').val(0);
         var name = $('#owner_'+id).text();
         name = '回复:' + name;
         $('#comment_name_'+id).text(name);
+}
+function replyShowmore(id){
+    $(".reply_form_"+id).toggle(function(){
+        $(".replyShowmore_"+id).toggle();  
+    });
 }
 
 

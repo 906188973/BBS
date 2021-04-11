@@ -39,6 +39,9 @@ def fourm(request, forum_id):
     if request.method != 'POST':
         form_topic = TopicForm()
         form_floor = FloorForm()
+        topic_count = 0
+        for i in topics:
+            topic_count += i.floor_count
         # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
         page = request.GET.get('page')
         try:
@@ -75,7 +78,7 @@ def fourm(request, forum_id):
             return HttpResponseRedirect(reverse('web:forum', args=[forum_id]))
     context = {'forum': forum, 'form_topic': form_topic, 'form_floor': form_floor, 'topic_page':topic_page}
     context['user_forum'] = user_forum
-
+    context['topic_count'] = topic_count
     if topics:
         context['topics'] = topics
     return render(request, 'web/topics.html', context)
@@ -99,6 +102,11 @@ def topic(request, topic_id):
     collect = []
     for i in obj:
         collect.append(i.topic.id)
+
+    obj = UserToForum.objects.filter(user=request.user, status=True).all()
+    user_forum = []
+    for i in obj:
+        user_forum.append(i.forum.id)
 
     obj = FloorGreat.objects.filter(user=request.user, status=True).all()
     floorgreat = []
@@ -148,6 +156,7 @@ def topic(request, topic_id):
     context['floorgreat'] = floorgreat
     context['commentgreat'] = commentgreat
     context['floors_page'] = floors_page
+    context['user_forum'] = user_forum
     return render(request, 'web/topic.html', context)
 
 def floor_del(request, id):
