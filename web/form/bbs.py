@@ -1,6 +1,8 @@
 from django import forms
 from web.models import Forum, Topic, Floor
 from django.core.exceptions import ValidationError
+from ckeditor.widgets import CKEditorWidget
+from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 class ForumForm(forms.ModelForm):
     forum_name = forms.CharField(label='版块名')
@@ -23,9 +25,14 @@ class TopicForm(forms.ModelForm):
         labels = {'topic_text': ''}
         widgets = {'topic_text': forms.TextInput(attrs={'style': "width: 756.68px;"})}
 
-class FloorForm(forms.ModelForm):
-    class Meta:
-        model = Floor
-        fields = ['floor_text']
-        labels = {'floor_text': ''}
-        widgets = {'floor_text': forms.Textarea(attrs={'cols': 115, 'style': "resize:none"})}
+class FloorForm(forms.Form):
+    floor_text = forms.CharField(widget=CKEditorUploadingWidget(config_name='comment_ckeditor'))
+
+    # class Meta:
+    #     model = Floor
+    #     fields = ['floor_text']
+    #     labels = {'floor_text': ''}
+    #     widgets = {'floor_text': forms.Textarea(attrs={'cols': 115, 'style': "resize:none"})}
+    def clean_floor_text(self):
+        floor_text = self.cleaned_data['floor_text']
+        return floor_text

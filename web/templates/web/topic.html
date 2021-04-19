@@ -68,12 +68,10 @@ img.comment_head{
       border: 2px solid black;
 }
 .form{
-    height: 320px;
     width: 800px;
     margin:0px auto;
     border: 2px solid black;
-    padding-left: 10px;
-    padding-top: 10px;
+    padding: 10px 20px 10px 20px;
 }
 .floor{
   padding-top: 10px;
@@ -119,6 +117,12 @@ img.comment_head{
 .reply_text{
     resize: none;
     width: 780px;
+}
+.content_img{
+  padding-right: 20px;
+}
+.content_img img{
+  max-width: 100%;
 }
 </style>
 {% endblock %}
@@ -193,7 +197,7 @@ img.comment_head{
 					<div class="forums">
 						<div >
 							<div>
-								<p>{{ floor.floor_text|linebreaks }}</p>
+								<div class="content_img">{{ floor.floor_text|safe|linebreaks }}</div>
 							</div>
 							<div style="position: relative;left: 800px;">
 								<a id="replyshow{{ floor.id }}"href="javascript:replyShow({{ floor.id }});">收起回复</a>
@@ -432,8 +436,10 @@ img.comment_head{
         <p>发表回复</p>
         <form action="{% url 'web:topic' topic.id%}" method="post">
           {% csrf_token %}
-          {{ form.as_p }}
-          <button name="submit">发表</button>
+          {% for field in form %}
+            {{ field }}
+          {% endfor %}
+          <button name="submit" style="margin-top: 5px;">发表</button>
           <a name="form"></a>
         </form>
       </div>

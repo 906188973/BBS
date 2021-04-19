@@ -15,13 +15,11 @@
       margin-left: 5px;
   }
   .form{
-    height: 370px;
     width: 800px;
     margin:0px auto;
     background-color: rgb(253,253,253);
     border: 1px solid #ddd;
-    padding-left: 20px;
-    padding-top: 10px;
+    padding: 10px 20px 10px 20px;
   }
   .top{
     float: left;
@@ -102,6 +100,9 @@
   line-height: 200%;
   margin-left: 50px;
 }
+.content_img img{
+  max-width: 100%;
+}
 
   </style>
 {% endblock %}
@@ -143,8 +144,8 @@
             {% endif %}
             <i class="fa fa-user-o" ></i><a href="{% url 'web:other' topic.owner.id %}"> {{ topic.owner }}</a>
           </div>
-          <p>{{ topic.floor_set.first }}</p>
-          
+          <!-- <p>{{ topic.floor_set.first|striptags }}</p> -->
+          <div class="content_img">{{ topic.floor_set.first|safe }}</div>
         </div>
         </li>
         {% empty %}
@@ -276,15 +277,16 @@
       贴子数 <span style="color: rgb(52,92,161);">{{ topic_count }}</span> 篇
     </div>
   </div>
-  <div style="padding-top: 5px;position: relative;top:-80px">
+  <div style="position: relative;top:-80px">
     <div class="form">
       <h5>发表新贴</h5>
       <form action="{% url 'web:forum' forum.id %}" method="post">
         {% csrf_token %}
         {{ form_topic.as_p }}
-        <br>
-        {{ form_floor.as_p }}
-        <button name="submit">发表</button>
+        {% for field in form_floor %}
+          {{ field }}
+        {% endfor %}
+        <button name="submit" style="margin-top: 5px;">发表</button>
         <a name="form"></a>
       </form>
     </div>

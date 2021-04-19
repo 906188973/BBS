@@ -4,6 +4,11 @@
 {% block title %}首页{% endblock %}
 {% block css %}
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
+  <style>
+    .content_img img{
+  max-width: 100%;
+}
+  </style>
 {% endblock %}
 
 {% block content %}
@@ -34,7 +39,7 @@
           <li>
             <div class="hottopic">
               <a href="{% url 'web:topic' topic.id %}">{{ topic }}</a>
-              <p>{{ topic.floor_set.first }}</p>
+              <div class="content_img">{{ topic.floor_set.first|safe }}</div>
               <p>
                 <i class="fa fa-user"></i> 
                 <a href="{% url 'web:other' topic.floor_set.first.owner.id%}">{{ topic.floor_set.first.owner }}</a> / 

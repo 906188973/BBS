@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'ckeditor',
+    'ckeditor_uploader',
     #我的app
     'web',
 ]
@@ -146,6 +148,36 @@ WHITE_REGEX_URL_LIST = [
 MEDIA_ROOT = os.path.join(BASE_DIR, "web/static/img")
 # 图片访问url
 MEDIA_URL = '/IMG/'
+
+# 配置ckeditor
+CKEDITOR_UPLOAD_PATH = 'upload/'
+CKEDITOR_BROWSE_SHOW_DIRS = True #在编辑器里浏览上传的图片时，图片会以路径分组，日期排序
+CKEDITOR_ALLOW_NONIMAGE_FILES = False #不允许非图片文件上传
+
+CKEDITOR_CONFIGS = {
+    'comment_ckeditor':{
+        'toolbar': 'custom',
+        'toolbar_YourCustomToolbarConfig': [
+            {'name': 'styles', 'items': ['Font', 'FontSize']},
+            {'name': 'colors', 'items': ['TextColor']},
+            {'name': 'basicstyles',
+             'items': ['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-']},
+            {'name': 'paragraph',
+             'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-']},
+            # {'name': 'links'},
+            {'name': 'insert',
+             'items': ['Image',  'Table', 'HorizontalRule', 'Smiley', 'SpecialChar']},
+            '/',
+
+        ],
+        'toolbar': 'YourCustomToolbarConfig',
+        'height': '200',
+        'width': 756.68,
+        'tabSpaces': 4,
+        'removePlugins': 'elementspath',
+        'resize_enabled': False,
+    }
+}
 
 try:
     from .local_settings import *

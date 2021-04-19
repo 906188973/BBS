@@ -30,7 +30,7 @@ def fourm(request, forum_id):
     obj = UserToForum.objects.filter(user=request.user, status=True).all()
 
     # 将数据按照规定每页显示 10 条, 进行分割
-    paginator = Paginator(topics, 5)
+    paginator = Paginator(topics, 20)
 
     user_forum = []
     for i in obj:
@@ -66,7 +66,9 @@ def fourm(request, forum_id):
             topic.floor_count = 1
             topic.save()
 
-            floor = form_floor.save(commit=False)
+            # floor = form_floor.save(commit=False)
+            floor = Floor()
+            floor.floor_text = form_floor.cleaned_data['floor_text']
             floor.owner = request.user
             floor.topic = topic
             floor.floor_number = 1
@@ -118,7 +120,7 @@ def topic(request, topic_id):
     for i in obj:
         commentgreat.append(i.comment.id)
 
-    paginator = Paginator(floors, 2)
+    paginator = Paginator(floors, 20)
     """回复帖子"""
     if request.method != 'POST':
         form = FloorForm()
@@ -137,10 +139,12 @@ def topic(request, topic_id):
             # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
             floors_page = paginator.page(paginator.num_pages)
     else:
-        form = FloorForm(request.POST)
+        form = FloorForm(data=request.POST)
         if form.is_valid():
             obj = Floor.objects.filter(topic=topic).aggregate(max=Max('floor_number'))
-            floor = form.save(commit=False)
+            # floor = form.save(commit=False)
+            floor = Floor()
+            floor.floor_text = form.cleaned_data['floor_text']
             floor.topic = topic
             floor.owner = request.user
             floor.floor_number = obj['max'] + 1

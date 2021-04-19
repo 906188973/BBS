@@ -1,4 +1,6 @@
 from django.db import models
+from ckeditor.fields import RichTextField
+from ckeditor_uploader.fields import RichTextUploadingField
 
 # Create your models here.
 class UserInfo(models.Model):
@@ -9,6 +11,7 @@ class UserInfo(models.Model):
         (3, "版主"),
         (4, "管理员"),
     )
+
     username = models.CharField(verbose_name='用户名', max_length=32, db_index=True)
     email = models.EmailField(verbose_name='邮件', max_length=32)
     mobile_phone = models.CharField(verbose_name='手机号', max_length=32)
@@ -17,6 +20,8 @@ class UserInfo(models.Model):
     power = models.SmallIntegerField(choices=POWER_CHOICES, default=1)
     power_name = models.CharField(max_length=20, default='普通用户')
     describe = models.TextField(verbose_name='个性签名', null=True)
+    is_active = models.SmallIntegerField(default=1)
+    is_staff = models.SmallIntegerField(default=1)
 
     def __str__(self):
         return self.username
@@ -51,7 +56,7 @@ class Topic(models.Model):
 
 class Floor(models.Model):
     """楼层表"""
-    floor_text = models.TextField()
+    floor_text = RichTextUploadingField()
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     floor_number = models.IntegerField()
@@ -65,7 +70,7 @@ class Floor(models.Model):
 
 class Comment(models.Model):
     """帖子回复表"""
-    text = models.TextField(max_length=200)
+    text = RichTextField()
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, related_name="comments", on_delete=models.DO_NOTHING)
     by_owner = models.ForeignKey(UserInfo, null=True, related_name="replies", on_delete=models.DO_NOTHING)
