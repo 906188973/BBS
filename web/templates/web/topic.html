@@ -96,7 +96,7 @@ img.comment_head{
 }
 .forums{
     padding: 0px 10px 0px 10px;
-    margin-left: 100px;
+    margin-left: 20px;
     margin-bottom: 10px;
 }
 .forums p{
@@ -107,6 +107,8 @@ img.comment_head{
     border: 1px solid #ddd;
     width: 800px;
     padding: 5px 10px 5px 10px;
+    position: relative;
+    left: 85px;
 }
 .reply a{
   color: rgb(52,92,161);
@@ -184,14 +186,15 @@ img.comment_head{
                 <p id="reply_father" style="font-size: 15px;color: rgb(137,137,137);">{{ floor.floor_number }}楼&nbsp;&nbsp;&nbsp;
                 {{ floor.date_added|date:'Y-m-d H:i' }}</p>
               </div>
-              <div style="float: right;font-size: 30px;">
+              <div style="float: right;font-size: 30px;padding-right: 15px;padding-top: 10px;">
                 {% if floor.id in floorgreat %}
-                <a style="pointer-events: none;">已点赞({{ floor.great }})</a>
-                <a id="unfloorGreat_{{ floor.id }}" href="javascript:unfloorGreat({{ floor.id }});">取消点赞</a>
+                <a id="floorGreat_{{ floor.id }}" href="javascript:void(0)" onclick="unfloorGreat({{ floor.id }})">
+                  <i class="fa fa-thumbs-up" style="color: rgb(52,92,161);"></i></a> {{ floor.great }}
                 {% else %}
-                <a id="floorGreat_{{ floor.id }}" href="javascript:floorGreat({{ floor.id }});">点赞({{ floor.great }})</a>
+                <a id="floorGreat_{{ floor.id }}" href="javascript:void(0)" onclick="floorGreat({{ floor.id }})">
+                  <i class="fa fa-thumbs-up" style="color: rgb(136,136,136);"></i></a> {{ floor.great }}
                 {% endif %}
-              </div> 
+              </div>
             </div>
           </div>
 					<div class="forums">
