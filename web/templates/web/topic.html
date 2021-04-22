@@ -126,6 +126,15 @@ img.comment_head{
 .content_img img{
   max-width: 100%;
 }
+.great{
+  float: right;
+  font-size: 30px;
+  padding-right: 15px;
+  padding-top: 10px;
+}
+.great i:hover{
+  font-size: 50px;
+}
 </style>
 {% endblock %}
 
@@ -186,13 +195,14 @@ img.comment_head{
                 <p id="reply_father" style="font-size: 15px;color: rgb(137,137,137);">{{ floor.floor_number }}楼&nbsp;&nbsp;&nbsp;
                 {{ floor.date_added|date:'Y-m-d H:i' }}</p>
               </div>
-              <div style="float: right;font-size: 30px;padding-right: 15px;padding-top: 10px;">
+              <div class="great" id="nb_{{ floor.id }}">{{ floor.great }}</div>
+              <div class="great">
                 {% if floor.id in floorgreat %}
                 <a id="floorGreat_{{ floor.id }}" href="javascript:void(0)" onclick="unfloorGreat({{ floor.id }})">
-                  <i class="fa fa-thumbs-up" style="color: rgb(52,92,161);"></i></a> {{ floor.great }}
+                  <i class="fa fa-thumbs-up" style="color: rgb(52,92,161);"></i></a>
                 {% else %}
                 <a id="floorGreat_{{ floor.id }}" href="javascript:void(0)" onclick="floorGreat({{ floor.id }})">
-                  <i class="fa fa-thumbs-up" style="color: rgb(136,136,136);"></i></a> {{ floor.great }}
+                  <i class="fa fa-thumbs-up" style="color: rgb(136,136,136);"></i></a>
                 {% endif %}
               </div>
             </div>
@@ -214,6 +224,9 @@ img.comment_head{
 								{% for reply in floor.comment_set.all %}
                 {% if forloop.counter > 2 %}
                   <div class="reply_form_{{ floor.id }}" style="display: none;">
+                {% else %}
+                  <div>
+                {% endif %}
                     <div id="reply_{{ reply.id }}" class="reply_list_{{ floor.id }}" style="padding-bottom: 5px;padding-top: 5px;">
                       <div>
                         {% if reply.owner.head_portrait %}
@@ -249,42 +262,6 @@ img.comment_head{
                       </div>
                    </div>
                   </div>
-                {% else %}
-								<div id="reply_{{ reply.id }}" class="reply_list_{{ floor.id }}" style="padding-bottom: 5px;padding-top: 5px;">
-                    <div>
-                      {% if reply.owner.head_portrait %}
-                      <img class='comment_head' src='{{ reply.owner.head_portrait.url }}'>
-                      {% else %}
-                      <img class='comment_head' src="{% static 'img/default.jpg' %}">
-                      {% endif %}
-                      {% if reply.by_owner == Null %}
-                      <a id="replyowner_{{ reply.id }}" href="{% url 'web:other' reply.owner.id %}">{{ reply.owner }}</a>
-                      {% else %}
-                      <a id="replyowner_{{ reply.id }}" href="{% url 'web:other' reply.owner.id %}">{{ reply.owner }}</a>:回复 
-                      {% if reply.by_owner.head_portrait %}
-                      <img class='comment_head' src='{{ reply.by_owner.head_portrait.url }}'>
-                      {% else %}
-                      <img class='comment_head' src="{% static 'img/default.jpg' %}">
-                      {% endif %}
-                      <a href="{% url 'web:other' reply.by_owner.id %}" style="padding-left:2px;">{{ reply.by_owner }}</a>
-                      {% endif %}
-                      <span> ({{ reply.date_added|date:'Y-m-d H:i' }}):</span>
-                      <span>{{ reply.text }}</span>
-                    </div>
-										<div style="padding-right: 5px;position: relative;right: -650px;">
-											<a href="javascript:reply({{ reply.id }},{{ floor.id }});">回复</a>
-											{% if reply.owner == request.user %}
-											<a href="javascript:replyDel({{ reply.id }});">删除</a>
-											{% endif %}
-											{% if reply.id in commentgreat %}
-											<a style="pointer-events: none;">已点赞({{ reply.great }})</a>
-											<a id="uncommentGreat_{{ reply.id }}" href="javascript:uncommentGreat({{ reply.id }});">取消点赞</a>
-											{% else %}
-											<a id="commentGreat_{{ reply.id }}" href="javascript:commentGreat({{ reply.id }});">点赞({{ reply.great }})</a>
-											{% endif %}
-										</div>
-								</div>
-                {% endif %}
                   {% if forloop.counter == 2 %}
                   <div style="padding-left: 340px;">
                     <a href="javascript:replyShowmore({{ floor.id }});" class="replyShowmore_{{ floor.id }}">显示更多</a>
@@ -520,6 +497,7 @@ img.comment_head{
                 }  
             }  
         }
+        
   </script>
   <script src="{% static 'js/topic.js' %}"></script>
 {% endblock %}

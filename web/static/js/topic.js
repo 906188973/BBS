@@ -43,10 +43,10 @@ function replyShow(id){
         name = '回复:' + name;
         $('#comment_name_'+id).text(name);
 }
+
 function replyShowmore(id){
-    $(".reply_form_"+id).toggle(function(){
-        $(".replyShowmore_"+id).toggle();  
-    });
+    $(".reply_form_"+id).toggle();
+    $(".replyShowmore_"+id).toggle();  
 }
 
 
@@ -121,7 +121,12 @@ function floorGreat(id) {
         type: "POST",
         success: function (res) {
             if(res.status){
-            $('#floorGreat_'+id).text("已点赞");
+            var obj = $('#floorGreat_'+id);
+            obj.children().attr("style","color: rgb(52,92,161)");
+            obj.attr("onclick","unfloorGreat(" +id + ")");
+            var nb = $('#nb_'+id).text();
+            nb = parseInt(nb) + 1;
+            $('#nb_'+id).text(nb);
             }
         }
     })
@@ -134,7 +139,12 @@ function unfloorGreat(id) {
         type: "POST",
         success: function (res) {
             if(res.status){
-            $('#unfloorGreat_'+id).remove();
+                var obj = $('#floorGreat_'+id);
+                obj.children().attr("style","color: rgb(136,136,136);");
+                obj.attr("onclick","floorGreat(" +id + ")");
+                var nb = $('#nb_'+id).text();
+                nb = parseInt(nb) - 1;
+                $('#nb_'+id).text(nb);
             }
         }
     })

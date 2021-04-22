@@ -178,34 +178,40 @@ def update_comment(request):
     """加评论"""
     data = {}
     if request.method == 'POST':
-            user = request.user
-            text = request.POST.get('reply_text', '')
-            floor_id = int(request.POST.get('floor_id', ''))
-            floor = Floor.objects.get(id=floor_id)
-            comment_id = int(request.POST.get('comment_id'))
 
-            comment = Comment()
-            comment.owner = user
-            comment.text = text
-            comment.floor = floor
+        user = request.user
+        text = request.POST.get('reply_text', '')
+        floor_id = int(request.POST.get('floor_id', ''))
+        data['floor_id'] = floor_id
+        floor = Floor.objects.get(id=floor_id)
+        comment_id = int(request.POST.get('comment_id'))
 
-            if comment_id != 0:
+        comment = Comment()
+        comment.owner = user
+        comment.text = text
+        comment.floor = floor
 
-                obj = Comment.objects.get(id=comment_id)
-                comment.by_owner = obj.owner
-                data['by_owner'] = obj.owner.username
-                data['owner_status'] = True
-            else:
-                data['owner_status'] = False
-            comment.save()
+        if comment_id != 0:
+
+            obj = Comment.objects.get(id=comment_id)
+            comment.by_owner = obj.owner
+            data['by_owner'] = obj.owner.username
+            data['br_id'] = obj.owner.id
+            data['br_head_portrait'] = obj.owner.head_portrait.url
+            data['owner_status'] = True
+        else:
+            data['owner_status'] = False
+        comment.save()
 
     # referer = request.META.get('HTTP_REFERER', reverse('tiebas:index'))
     # return redirect(referer)
-            data['status'] = True
-            data['username'] = comment.owner.username
-            data['comment_time'] = comment.date_added.strftime('%Y-%m-%d %H:%M:%S')
-            data['text'] = comment.text
-            data['reply_id'] = comment.id
+        data['status'] = True
+        data['username'] = comment.owner.username
+        data['us_id'] = comment.owner.id
+        data['us_head_portrait'] = comment.owner.head_portrait.url
+        data['comment_time'] = comment.date_added.strftime('%Y-%m-%d %H:%M:%S')
+        data['text'] = comment.text
+        data['reply_id'] = comment.id
     else:
         data['status'] = False
     return JsonResponse(data)
