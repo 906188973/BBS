@@ -1,0 +1,35 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+{% block title %}首页{% endblock %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+  <div>
+    <h1>搜索到的吧名</h1>
+    {% for i in forum %}
+      <div>{{ i.forum_name }}</div>
+    {% endfor %}
+  </div>
+  
+  <div>
+    <h1>搜索到的帖子主题</h1>
+    {% for i in topic %}
+      <div>{{ i.topic_text }} {{ i.owner }} {{ i.date_added}} {{ i.forum }} {{ i.floor_set.first|safe }}</div>
+    {% endfor %}
+  </div>
+  <div>
+    <h1>搜索到的内容</h1>
+    {% if floor %}
+      {% for i in floor %}
+        <div>{{ i.floor_text }}  {{ i.owner }} {{ i.date_added}} {{ i.topic.forum }}</div>
+      {% endfor %}
+    {% else %}
+      <P>没有搜索结果</P>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block js %}
+{% endblock %}

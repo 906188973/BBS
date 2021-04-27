@@ -89,12 +89,14 @@
           <li><a href="{% url 'web:register' %}" style="color: white;">注册</a></li>
         {% endif %}
       </ul>
-      <form class="navbar-form navbar-right" style="">
+      <div class="navbar-form navbar-right">
         <div class="form-group">
           <input type="text" class="form-control" placeholder="搜索帖子">
         </div>
-        <button type="submit" class="btn btn-default"><i class="fa fa-search fa-1x"></i></button>
-      </form>
+        <button type="submit" class="btn btn-default" onclick="search()"><i class="fa fa-search fa-1x"></i></button>
+      </div>
+
+
     </div><!-- /.navbar-collapse -->
   </div><!-- /.container-fluid -->
 </nav>
@@ -105,6 +107,11 @@
         $.ajaxSetup({
           data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
         })
+        function search(){
+          var wd = $('.form-control').val();
+          var url = '/search/' + wd + '/';
+          window.location.href=url;
+        }
     </script>
     {% block js %}{% endblock %}
 </body>

@@ -425,3 +425,11 @@ def unrefined(request):
         topic.refined = False
         topic.save()
         return JsonResponse({'status': 'True'})
+
+def search(request, wd):
+    """搜索"""
+    forum = Forum.objects.filter(forum_name__icontains=wd)
+    topic= Topic.objects.filter(topic_text__icontains=wd)
+    floor = Floor.objects.filter(floor_text__icontains=wd)
+    context = {'forum': forum, 'topic': topic, 'floor': floor}
+    return render(request, 'web/search.html', context)

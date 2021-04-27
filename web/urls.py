@@ -37,4 +37,5 @@ urlpatterns = [
     path('untop/', bbs.untop, name='untop'),
     path('refined/', bbs.refined, name='refined'),
     path('unrefined/', bbs.unrefined, name='unrefined'),
+    re_path(r'search/(?P<wd>.+)/$', bbs.search, name='search'),
 ]
