@@ -2,26 +2,44 @@ from django.shortcuts import render, redirect
 from web.form.bbs import ForumForm, TopicForm, FloorForm
 from django.http import JsonResponse, HttpResponseRedirect
 from web.models import Topic, Forum, Floor, Comment, UserToForum, Collect, UserInfo, ForumPower
-from web.models import FloorGreat, CommentGreat
+from web.models import FloorGreat, CommentGreat, ApplyforForum
 from django.db.models import Max
 from django.urls import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
+from itertools import chain
+from operator import attrgetter
 from django.views.decorators.csrf import csrf_exempt
 
-def create_forum(request):
+def applyforforum(request):
     """创建版块"""
-    if request.method == 'GET':
-        form = ForumForm()
-        context = {'form': form}
-        return render(request, 'web/create_forum.html', context)
-    form = ForumForm(request.POST, request.FILES)
-    if form.is_valid():
-        forum = form.save(commit=False)
-        forum.moderator = request.user
-        forum.save()
-        # return JsonResponse({'status': True, 'data': '/'})
-    return redirect('web:home')
-    # return JsonResponse({'status': False, 'error': form.errors})
+    if request.method == 'POST':
+        form = ForumForm(request.POST, request.FILES)
+        print(request.POST)
+        if form.is_valid():
+            forum = form.save(commit=False)
+            forum.user = request.user
+            forum.save()
+            return JsonResponse({'status': True})
+        # return redirect('web:home')
+        return JsonResponse({'status': False, 'error': form.errors})
+
+def create_forum(request, id):
+    """创建版块"""
+    if request.method == 'POST':
+        obj = ApplyforForum.objects.get(id=id)
+        exists = Forum.objects.filter(forum_name=obj.forum_name).exists()
+        if not exists:
+            forum = Forum()
+            forum.forum_name = obj.forum_name
+            forum.moderator = obj.user
+            forum.picture = obj.picture
+            forum.background = obj.background
+            forum.save()
+            obj.status = 1
+            obj.save()
+            return JsonResponse({'status': True})
+        # return redirect('web:home')
+        return JsonResponse({'status': False})
 
 def fourm(request, forum_id):
     """显示所有帖子主题"""
@@ -283,31 +301,31 @@ def uncollect(request, id):
         return JsonResponse({'status': 'True'})
 
 
-def change_power(request, id):
-    """更改权限"""
-    if request.method == 'GET':
-        if request.user.power == 4:
-            forums = Forum.objects.all()
-        else:
-            forums = request.user.forum_set.all()
-        user = UserInfo.objects.get(id=id)
-        context = {'forums': forums, 'user': user}
-        return render(request, 'web/change_power.html', context)
-    forum_id = request.POST.get('value')
-    forum = Forum.objects.get(id=forum_id)
-    user = UserInfo.objects.get(id=id)
-    obj = ForumPower.objects.filter(forum=forum, user=user).first()
-    if not obj:
-        obj = ForumPower()
-        obj.forum = forum
-        obj.user = user
-        obj.status = True
-        obj.save()
-        if user.power < 3:
-            user.power = 2
-            user.power_name = '版务'
-            user.save()
-    return JsonResponse({'status': 'True'})
+# def change_power(request, id):
+#     """更改权限"""
+#     if request.method == 'GET':
+#         if request.user.power == 4:
+#             forums = Forum.objects.all()
+#         else:
+#             forums = request.user.forum_set.all()
+#         user = UserInfo.objects.get(id=id)
+#         context = {'forums': forums, 'user': user}
+#         return render(request, 'web/change_power.html', context)
+#     forum_id = request.POST.get('value')
+#     forum = Forum.objects.get(id=forum_id)
+#     user = UserInfo.objects.get(id=id)
+#     obj = ForumPower.objects.filter(forum=forum, user=user).first()
+#     if not obj:
+#         obj = ForumPower()
+#         obj.forum = forum
+#         obj.user = user
+#         obj.status = True
+#         obj.save()
+#         if user.power < 3:
+#             user.power = 2
+#             user.power_name = '版务'
+#             user.save()
+#     return JsonResponse({'status': 'True'})
 
 def moderator(request, id):
     """设置版主"""
@@ -321,7 +339,7 @@ def moderator(request, id):
     user = UserInfo.objects.get(id=id)
     forum.moderator = user
     forum.save()
-    user.power = 3
+    user.power = 2
     user.power_name = '版主'
     user.save()
     return JsonResponse({'status': 'True'})
@@ -428,8 +446,18 @@ def unrefined(request):
 
 def search(request, wd):
     """搜索"""
-    forum = Forum.objects.filter(forum_name__icontains=wd)
-    topic= Topic.objects.filter(topic_text__icontains=wd)
-    floor = Floor.objects.filter(floor_text__icontains=wd)
-    context = {'forum': forum, 'topic': topic, 'floor': floor}
+    forum = []
+    topic = []
+    floor = []
+    wd_list = wd.split()
+    for wd in wd_list:
+        forum += Forum.objects.filter(forum_name__icontains=wd)
+        topic += Topic.objects.filter(topic_text__icontains=wd)
+        floor += Floor.objects.filter(floor_text__icontains=wd)
+    forum = list(set(forum))
+    topic = list(set(topic))
+    floor = list(set(floor))
+    search = sorted(chain(topic, floor), key=attrgetter('date_added'), reverse=True)
+    print(wd_list)
+    context = {'forum': forum, 'search': search, 'wd_list': wd_list}
     return render(request, 'web/search.html', context)

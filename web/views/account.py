@@ -70,6 +70,7 @@ def login(request):
                 return redirect('web:home')
             form.add_error('username', '用户名或密码错误')
     context = {'form': form}
+
     return render(request, 'web/login.html', context)
 
 def image_code(request):

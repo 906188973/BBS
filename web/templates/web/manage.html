@@ -1,0 +1,83 @@
+{% extends 'layout/basic.html' %}
+{% load static %}
+
+{% block title %}管理中心{% endblock %}
+{% block css %}
+{% endblock %}
+
+{% block content %}
+    管理中心
+    <div>
+        <div>举报信息</div>
+        <div>
+          {% for i in inform %}
+          <div>
+            {{ i.floor.floor_text }}
+          </div>
+          <div>
+            {{ i.text }}
+          </div>
+          <div>
+            {{ i.user }} {{ i.date_added }} <a>删除</a>
+          </div>
+          {% endfor %}
+        </div>
+        
+        {% if request.user.power == 3 %}
+        <div>申请信息</div>
+        <div>
+          {% for i in applyforForum %}
+          <div>
+            {{ i.forum_name }}
+          </div>
+          <div>
+            <img style="height: 100px;" src='{{ i.picture.url }}'>
+          </div>
+          <div>
+            <img style="height: 100px;" src='{{ i.background.url }}'>
+          </div>
+          <div>
+            {{ i.text }}
+          </div>
+          <div>
+            {{ i.user }} {{ i.date_added }} <a href="javascript:void(0)" onclick="create_forum({{ i.id }})">同意</a><a>不同意</a>
+          </div>
+          {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    <ul>
+        
+        <li><a href="{% url 'web:account' %}">帖子管理</a></li>
+        <li><a href="{% url 'web:account' %}">回复管理</a></li>
+        {% if request.user.power == 3 %}
+        <li><a href="{% url 'web:account' %}">版块管理</a></li>
+        <li><a href="{% url 'web:account' %}">用户管理</a></li>
+        {% endif %}
+    </ul>
+{% endblock %}
+
+{% block js %}
+  <script>
+    
+function create_forum(id) {
+    var flag = confirm("您真的确定要创建吗？")
+    if (flag) {
+        var pk = id
+        var url = '/create_forum/' + pk + '/'
+        $.ajax({
+            url: url,
+            type: "POST",
+            success: function (res) {
+                if(res.status){
+                  window.alert('同意成功');
+                }else{
+                  window.alert('直接存在相同的版块名');
+                }
+            }
+        })
+    }
+}
+  </script>
+{% endblock %}

@@ -217,6 +217,7 @@ img.comment_head{
 								{% if floor.owner == request.user %}
 								<a href="javascript:floorDel({{ floor.id }});">删除</a>
 								{% endif %}
+                <a href="{% url 'web:inform_floor' floor.id %}">举报</a>
 							</div>
 						</div>
 						<div  class="reply">

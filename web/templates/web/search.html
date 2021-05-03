@@ -3,33 +3,46 @@
 
 {% block title %}首页{% endblock %}
 {% block css %}
+<script>
+  var a = "{{ wd_list }}";
+  console.log(a);
+</script>
 {% endblock %}
 
 {% block content %}
-  <div>
-    <h1>搜索到的吧名</h1>
+  {% for i in wd_list %}
+  <input id="search" value="{{ i }}"  type="hidden">
+  {% endfor %}
+  <h1>搜索到的吧名</h1>
+  <div class="search">
     {% for i in forum %}
-      <div>{{ i.forum_name }}</div>
+      <div><span>{{ i.forum_name }}</span></div>
     {% endfor %}
+  </div>
+  <h1>搜索</h1>
+  <div class="search">
+      {% for i in search %}
+        {% if i.topic_text %}
+        <div style="padding-bottom: 20px;" id="topic_{{ i.id }}"><span>{{ i.topic_text }}</span> {{ i.owner }} {{ i.date_added}} {{ i.forum }} <div>{{ i.floor_set.first|safe }}</div></div>
+        {% else %}
+        <div style="padding-bottom: 20px;" id="floor_{{ i.id }}"><span>{{ i.floor_text|safe }}</span>  {{ i.owner }} {{ i.date_added}} {{ i.topic.forum }}</div>
+        {% endif %}
+      {% endfor %}
   </div>
   
-  <div>
-    <h1>搜索到的帖子主题</h1>
-    {% for i in topic %}
-      <div>{{ i.topic_text }} {{ i.owner }} {{ i.date_added}} {{ i.forum }} {{ i.floor_set.first|safe }}</div>
-    {% endfor %}
-  </div>
-  <div>
-    <h1>搜索到的内容</h1>
-    {% if floor %}
-      {% for i in floor %}
-        <div>{{ i.floor_text }}  {{ i.owner }} {{ i.date_added}} {{ i.topic.forum }}</div>
-      {% endfor %}
-    {% else %}
-      <P>没有搜索结果</P>
-    {% endif %}
-  </div>
 {% endblock %}
 
 {% block js %}
+<script>
+  // $(document).ready(function() {
+  //   var br = $("#search").val();
+  //     var af = '<span style="color:red;display: inline-block;">' + br + '</span>';
+  //     var obj = $(".search").find("span");
+  //     for (var i = 0; i < obj.length; i += 1) {
+  //       var str = obj[i].innerText;
+  //       str = str.replace(br,af);
+  //       obj[i].outerHTML = str;
+  //     }
+  // });
+</script>
 {% endblock %}

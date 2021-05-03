@@ -33,11 +33,21 @@ class Forum(models.Model):
     concern_count = models.IntegerField(default=0)
     date_added = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     moderator = models.ForeignKey(UserInfo, null=True, on_delete=models.SET_NULL)
-    picture = models.ImageField(verbose_name='图片', null=True, upload_to='picture/')
-    background = models.ImageField(verbose_name='背景图片', null=True, upload_to='background/')
+    picture = models.ImageField(verbose_name='图片', upload_to='picture/')
+    background = models.ImageField(verbose_name='背景图片', upload_to='background/')
 
     def __str__(self):
         return self.forum_name
+
+class ApplyforForum(models.Model):
+    """申请创建版块表"""
+    forum_name = models.CharField(verbose_name='版块名', max_length=32, db_index=True)
+    picture = models.ImageField(verbose_name='图片', upload_to='picture/')
+    background = models.ImageField(verbose_name='背景图片', upload_to='background/')
+    date_added = models.DateTimeField(verbose_name='申请时间', auto_now_add=True)
+    text = models.TextField(verbose_name='申请理由')
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    status = models.BooleanField(default=False)
 
 class Topic(models.Model):
     """帖子主题表"""
@@ -109,3 +119,12 @@ class CommentGreat(models.Model):
     user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
     comment = models.ForeignKey(Comment, on_delete=models.CASCADE)
     status = models.BooleanField(default=True)
+
+class Inform_Floor(models.Model):
+    """楼层举报表"""
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
+    text = models.CharField(max_length=200)
+    date_added = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    status = models.BooleanField(default=False)
+
