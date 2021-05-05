@@ -51,13 +51,13 @@ class ApplyforForum(models.Model):
 
 class Topic(models.Model):
     """帖子主题表"""
-    topic_text = models.CharField(max_length=200)
-    forum = models.ForeignKey(Forum, on_delete=models.CASCADE)
-    owner = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    topic_text = models.CharField(verbose_name='帖子内容', max_length=200)
+    forum = models.ForeignKey(Forum,verbose_name='所属版块', on_delete=models.CASCADE)
+    owner = models.ForeignKey(UserInfo, verbose_name='创建用户', on_delete=models.CASCADE)
     floor_count = models.IntegerField(default=0)
     date_added = models.DateTimeField(auto_now_add=True)
-    top = models.BooleanField(default=False)
-    refined = models.BooleanField(default=False)
+    top = models.BooleanField(verbose_name='是否置顶', default=False)
+    refined = models.BooleanField(verbose_name='是否加精', default=False)
 
     def __str__(self):
         if len(self.topic_text) > 36:

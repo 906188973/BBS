@@ -6,8 +6,9 @@
 {% endblock %}
 
 {% block content %}
-   举报
-   {{ floor.floor_text }}
+   <h1>举报</h1>
+   {{ floor.floor_text|safe }}
+   <h3>举报理由</h3>
    <form  action="{% url 'web:inform_floor' floor.id %}" method="POST"> 
     {% csrf_token %}
     {% for field in form %}

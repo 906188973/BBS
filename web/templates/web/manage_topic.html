@@ -4,17 +4,6 @@
 {% block title %}管理中心{% endblock %}
 {% block css %}
 <style>
-  .contentleft{
-    /* width: 27%; */
-    margin-right: 1.5%;
-    border-radius:4px;
-    float: right;
-    padding: 4px;
-    border: 2px double #ddd;
-    /* position: fixed;
-    top:17%;
-    right: 0px; */
-  }
   .message{
     background-color: #337ab7;
     color: white;
@@ -59,52 +48,49 @@
 {% endblock %}
 
 {% block content %}
-
     <h1 style="padding-left: 20px;">管理中心</h1>
     <div style="width: 70%;padding-left: 20px;float: left;">
-        <div class="message">
-          <h2>举报信息</h2>
-          {% for i in inform %}
-            {% if request.user.power == 3 or i.floor.topic.forum.moderator == request.user %}
-            <div class="messagecontent">
-              <h4><b>版块名 ： </b>{{ i.floor.topic.forum }}</h4>
-              <div style="padding-top: 4px;"><b>主题内容 ： </b>{{ i.floor.topic }}</div>
-              <div><b style="float: left;">举报内容 ： </b>{{ i.floor.floor_text|safe }}</div>
-              <div><b>举报理由 ： </b>{{ i.text }}</div>
-              <div style="float: right;padding-top: 4px;"><a>删除</a> &nbsp;<a>忽略</a></div>
-              <div style="padding-top: 4px;">
-                <a href="{% url 'web:other' i.user.id%}">{{ i.user }}</a> &nbsp;&nbsp;{{ i.date_added }}
-              </div>
-            </div>
-            {% endif %}
-          {% endfor %}
-        </div>
-        
-        {% if request.user.power == 3 %}
-        
-        <div class="message">
-          <h2>申请信息</h2>
-          {% for i in applyforForum %}
-          <div id="applyforForum_{{ i.id }}" class="messagecontent">
-            <div style="padding-bottom: 4px;"><b>申请版块名 ： </b>{{ i.forum_name }}</div>
-            <div style="padding-bottom: 4px;"><b>版块logo ： </b><img style="height: 150px;" src='{{ i.picture.url }}'></div>
-            <div style="padding-bottom: 4px;"><b>版块背景 ： </b><img style="height: 150px;" src='{{ i.background.url }}'></div>
-            <div style="padding-bottom: 4px;"><b>申请理由 ： </b>{{ i.text }}</div>
-            <div style="float: right;">
-              <a href="javascript:void(0)" onclick="create_forum({{ i.id }})">同意</a> &nbsp;
-              <a href="javascript:void(0)" onclick="uncreate_forum({{ i.id }})">不同意</a>
-            </div>
-            <div><a href="{% url 'web:other' i.user.id%}">{{ i.user }}</a> &nbsp;&nbsp;{{ i.date_added }}</div>
-          </div>
-          {% endfor %}
-        </div>
-        {% endif %}
+      <div class="message">
+        <h2>帖子管理</h2>
+        <table class="table table-condensed">
+          <tr class="messagecontent">
+              <th>id</th>
+              <th>帖子内容</th>
+              <th>所属版块</th>
+              <th>创建用户</th>
+              <th>创建时间</th>
+              <th>是否置顶</th>
+              <th>是否加精</th>
+              <th>操作</th>
+          </tr>
+        {% for topic in topics %}
+          <tr class="messagecontent">
+            <td>{{ topic.id }}</td>
+            <td>{{ topic.topic_text }}</td>
+            <td>{{ topic.forum }}</td>
+            <td>{{ topic.owner }}</td>
+            <td>{{ topic.date_added }}</td>
+            <td>
+              {% if topic.top %}
+              <a id="top_{{ topic.id }}" href="javascript:void(0)" onclick="unTop({{ topic.id }});">
+              {% else %}
+              <a id="top_{{ topic.id }}" href="javascript:void(0)" onclick="Top({{ topic.id }});">
+              {% endif %}
+              {{ topic.top }}
+              </a>
+            </td>
+            <td>{{ topic.refined }}</td>
+            <td><a href="javascript:void(0)" onclick="floorGreat({{ topic.id }})">删除</a></td>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
     </div>
     <div id="box">  
       <div id="float" class="div1">
           <ul class="nav nav-pills nav-stacked" >
-            <li role="presentation" class="active"><a href="{% url 'web:manage' %}">消息中心</a></li>
-              <li role="presentation"><a href="{% url 'web:manage_topic' %}">帖子管理</a></li>
+            <li role="presentation"><a href="{% url 'web:manage' %}">消息中心</a></li>
+              <li role="presentation" class="active"><a href="{% url 'web:manage_topic' %}">帖子管理</a></li>
               <li role="presentation"><a href="{% url 'web:manage_comment' %}">回复管理</a></li>
               {% if request.user.power == 3 %}
               <li role="presentation"><a href="{% url 'web:manage_forum' %}">版块管理</a></li>
@@ -113,7 +99,6 @@
           </ul>
       </div>  
     </div> 
-    
     <div style="height: 110px;position: fixed;bottom:-30px;right: 25%;">
       <ul >
         <li >
@@ -129,46 +114,7 @@
 
 {% block js %}
   <script>
-    
-function create_forum(id) {
-    var flag = confirm("您真的确定要创建吗？")
-    if (flag) {
-        var pk = id
-        var url = '/create_forum/' + pk + '/'
-        $.ajax({
-            url: url,
-            type: "POST",
-            success: function (res) {
-                if(res.status){
-                  window.alert('同意成功');
-                  $('#applyforForum_'+id).remove();
-                }else{
-                  window.alert('已存在相同的版块名');
-                }
-            }
-        })
-    }
-}
-function uncreate_forum(id) {
-    var flag = confirm("您真的确定要不同意创建吗？")
-    if (flag) {
-        var pk = id
-        var url = '/uncreate_forum/'
-        $.ajax({
-            url: url,
-            type: "POST",
-            data: {id:pk},
-            dataType: "JSON",
-            success: function (res) {
-                if(res.status){
-                  window.alert('不同意成功');
-                  $('#applyforForum_'+id).remove();
-                }
-            }
-        })
-    }
-}
-var goto_top_type = -1;  
+    var goto_top_type = -1;  
 var goto_top_itv = 0;  
   
 function goto_top_timer() {  
@@ -219,5 +165,39 @@ function goto_top() {
         };   
     }   
 })(); 
+function Top(id) {
+    var pk = id
+    $.ajax({
+        url: '/top/',
+        type: "POST",
+        data: {id:pk},
+        dataType: "JSON",
+        success: function (res) {
+            if(res.status){
+            $('#top_'+id).text("Ture");
+            $('#top_'+id).removeAttr("onclick")
+            href = "unTob(" + pk+ ");";
+            $('#top_'+id).attr("onclick","").click(function(){unTop(id)});
+            }
+        }
+    })
+}
+function unTop(id) {
+    var pk = id
+    $.ajax({
+        url: '/untop/',
+        type: "POST",
+        data: {id:pk},
+        dataType: "JSON",
+        success: function (res) {
+            if(res.status){
+            $('#top_'+ pk).text("False");
+            $('#top_'+id).removeAttr("onclick")
+            href = "Tob(" + pk+ ");";
+            $('#top_'+id).attr("onclick","").click(function(){Top(id)});
+            }
+        }
+    })
+}
   </script>
 {% endblock %}

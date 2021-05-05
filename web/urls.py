@@ -17,7 +17,8 @@ urlpatterns = [
     re_path(r'^other/(?P<id>\d+)/$', account.other, name='other'),
 
     path('applyforforum/', bbs.applyforforum, name='applyforforum'),
-    re_path('create_forum/(?P<id>\d+)/$', bbs.create_forum, name='create_forum'),
+    re_path(r'^create_forum/(?P<id>\d+)/$', bbs.create_forum, name='create_forum'),
+    path('uncreate_forum/', bbs.uncreate_forum, name='uncreate_forum'),
     re_path(r'^forum/(?P<forum_id>\d+)/$', bbs.fourm, name='forum'),
     re_path(r'^topic/(?P<topic_id>\d+)/$', bbs.topic, name='topic'),
     path('update_comment/', bbs.update_comment, name='update_comment'),
@@ -42,4 +43,8 @@ urlpatterns = [
 
     path('manage/', manage.index, name='manage'),
     re_path(r'^inform_floor/(?P<id>\d+)/$', manage.inform_floor, name='inform_floor'),
+    path('manage_topic/', manage.manage_topic, name='manage_topic'),
+    path('manage_comment/', manage.manage_comment, name='manage_comment'),
+    path('manage_forum/', manage.manage_forum, name='manage_forum'),
+    path('manage_user/', manage.manage_user, name='manage_user'),
 ]

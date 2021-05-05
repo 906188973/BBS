@@ -11,7 +11,7 @@ from operator import attrgetter
 from django.views.decorators.csrf import csrf_exempt
 
 def applyforforum(request):
-    """创建版块"""
+    """申请版块"""
     if request.method == 'POST':
         form = ForumForm(request.POST, request.FILES)
         print(request.POST)
@@ -40,6 +40,14 @@ def create_forum(request, id):
             return JsonResponse({'status': True})
         # return redirect('web:home')
         return JsonResponse({'status': False})
+
+def uncreate_forum(request):
+    """不同意创建版块"""
+    if request.method == 'POST':
+        id = int(request.POST.get('id'))
+        obj = ApplyforForum.objects.get(id=id)
+        obj.delete()
+        return JsonResponse({'status': 'True'})
 
 def fourm(request, forum_id):
     """显示所有帖子主题"""

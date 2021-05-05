@@ -50,3 +50,9 @@ class FloorForm(forms.Form):
     def clean_floor_text(self):
         floor_text = self.cleaned_data['floor_text']
         return floor_text
+
+class TopicchangeForm(forms.ModelForm):
+    class Meta:
+        model = Topic
+        fields = ['topic_text', 'forum', 'owner', 'top', 'refined']
+        widgets = {'topic_text': forms.TextInput(attrs={'style': ""})}
