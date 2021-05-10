@@ -176,66 +176,74 @@ function uncommentGreat(id) {
     })
 }
 function Top(id) {
-    var pk = id
-    $.ajax({
-        url: '/top/',
-        type: "POST",
-        data: {id:pk},
-        dataType: "JSON",
-        success: function (res) {
-            if(res.status){
-            $('#top').text("取消置顶");
-            href = "javascript:unTob(" + pk+ ");";
-            $('#top').attr("href",href);
-            }
-        }
-    })
-}
-function unTop(id) {
-    var pk = id
-    $.ajax({
-        url: '/untop/',
-        type: "POST",
-        data: {id:pk},
-        dataType: "JSON",
-        success: function (res) {
-            if(res.status){
-            $('#top').text("置顶");
-            href = "javascript:Tob(" + pk+ ");";
-            $('#top').attr("href",href);
-            }
-        }
-    })
-}
-function Refined(id) {
-    var pk = id
-    $.ajax({
-        url: '/refined/',
-        type: "POST",
-        data: {id:pk},
-        dataType: "JSON",
-        success: function (res) {
-            if(res.status){
-            $('#refined').text("取消加精");
-            href = "javascript:unRefined(" + pk+ ");";
-            $('#refined').attr("href",href);
-            }
-        }
-    })
-}
-function unRefined(id) {
-    var pk = id
-    $.ajax({
-        url: '/unrefined/',
-        type: "POST",
-        data: {id:pk},
-        dataType: "JSON",
-        success: function (res) {
-            if(res.status){
-            $('#refined').text("加精");
-            href = "javascript:Refined(" + pk+ ");";
-            $('#refined').attr("href",href);
-            }
-        }
-    })
-}
+    var flag = confirm("您真的确定要置顶吗？")
+    if(flag){
+      $.ajax({
+          url: '/top/',
+          type: "POST",
+          data: {id:id},
+          dataType: "JSON",
+          success: function (res) {
+              if(res.status){
+              $('#top').text("取消置顶");
+              href = "unTob(" + id + ");";
+              $('#top').attr("onclick","").click(function(){unTop(id)});
+              }
+          }
+      })
+    }
+  }
+  function unTop(id) {
+    var flag = confirm("您真的确定要取消置顶吗？")
+    if(flag){
+      $.ajax({
+          url: '/untop/',
+          type: "POST",
+          data: {id:id},
+          dataType: "JSON",
+          success: function (res) {
+              if(res.status){
+              $('#top').text("置顶");
+              href = "Tob(" + id + ");";
+              $('#top').attr("onclick","").click(function(){Top(id)});
+              }
+          }
+      })
+    }
+  }
+  function Refined(id) {
+    var flag = confirm("您真的确定要加精吗？")
+    if(flag){
+      $.ajax({
+          url: '/refined/',
+          type: "POST",
+          data: {id:id},
+          dataType: "JSON",
+          success: function (res) {
+              if(res.status){
+              $('#refined').text("取消加精");
+              href = "unRefined(" + id+ ");";
+              $('#refined').attr("onclick","").click(function(){unRefined(id)});
+              }
+          }
+      })
+    }
+  }
+  function unRefined(id) {
+    var flag = confirm("您真的确定要取消加精吗？")
+    if(flag){
+      $.ajax({
+          url: '/unrefined/',
+          type: "POST",
+          data: {id:id},
+          dataType: "JSON",
+          success: function (res) {
+              if(res.status){
+              $('#refined').text("加精");
+              href = "Refined(" + id+ ");";
+              $('#refined').attr("onclick","").click(function(){Refined(id)});
+              }
+          }
+      })
+    }
+  }

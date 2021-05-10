@@ -1,41 +1,257 @@
 {% extends 'layout/basic.html' %}
 {% load static %}
 
-{% block title %}首页{% endblock %}
+{% block title %}搜索{% endblock %}
 {% block css %}
-<script>
-  var a = "{{ wd_list }}";
-  console.log(a);
-</script>
+ <style>
+   .search{
+     width: 70%;
+     margin-left: 15%;
+   }
+   .forumimg{
+  display: inline-block;
+  width: 154px;
+  height: 154px;
+}
+.forumimg:hover{
+  border: 2px solid black;
+}
+.hottopic{
+  border-bottom: 1px solid #ddd;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.hottopic:hover{
+  background-color: rgb(240,240,240);
+}
+.hottopic a{
+  color: rgb(52,92,161);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 180%;
+}
+.hottopic a:hover{
+  color: red;
+}
+.hottopic p{
+  color: rgb(136,136,136);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 200%;
+}
+.hottopic p a{
+  color: rgb(136,136,136);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 200%;
+}
+ </style>
 {% endblock %}
 
 {% block content %}
-  {% for i in wd_list %}
-  <input id="search" value="{{ i }}"  type="hidden">
-  {% endfor %}
-  <h1>搜索到的吧名</h1>
+  <input  id="search" value="{{ wd }}"  type="hidden">
+  
   <div class="search">
-    {% for i in forum %}
-      <div><span>{{ i.forum_name }}</span></div>
+    <h1 style="color: rgb(52,92,161);">搜索到的版块</h1>
+    {% for forum in forums %}
+      <div style="margin: 4px 20px 4px 20px;float: left;">
+        <a href="{% url 'web:forum' forum.id%}" class="forumimg">
+          <img style="height: 150px; width: 150px;" src='{{ forum.picture.url }}'>
+        </a>
+        <div>
+          <a href="{% url 'web:forum' forum.id %}">{{ forum }}</a>
+          
+          <div style="float: right;"><i class="fa fa-user"></i>  {{ forum.concern_count }} &nbsp;&nbsp;<i class="fa fa-list" ></i>  {{ forum.topic_count }}</div>
+        </div>
+      </div>
     {% endfor %}
   </div>
-  <h1>搜索</h1>
-  <div class="search">
-      {% for i in search %}
+  
+  <div class="search" style="float: left;">
+    <h1 style="color: rgb(52,92,161);"> 搜索</h1>
+      {% for i in search_page %}
         {% if i.topic_text %}
-        <div style="padding-bottom: 20px;" id="topic_{{ i.id }}"><span>{{ i.topic_text }}</span> {{ i.owner }} {{ i.date_added}} {{ i.forum }} <div>{{ i.floor_set.first|safe }}</div></div>
+        <li>
+          <div class="hottopic">
+            <a href="{% url 'web:topic' i.id %}">{{ i }}</a>
+            <div class="content_img">{{ i.floor_set.first|safe }}</div>
+            <p style="float: right;">{{ i.date_added}}</p>
+            <p>
+              <i class="fa fa-user"></i> 
+              <a href="{% url 'web:other' i.floor_set.first.owner.id%}">{{ i.floor_set.first.owner }}</a> / 
+              <a href="{% url 'web:forum' i.forum.id%}">{{ i.forum }}</a>
+            </p> 
+          </div>
+        </li>
         {% else %}
-        <div style="padding-bottom: 20px;" id="floor_{{ i.id }}"><span>{{ i.floor_text|safe }}</span>  {{ i.owner }} {{ i.date_added}} {{ i.topic.forum }}</div>
+        <li>
+          <div class="hottopic">
+            <a href="{% url 'web:topic' i.topic.id %}">{{ i.topic }}</a>
+            <div class="content_img">{{ i|safe }}</div>
+            <p style="float: right;">{{ i.date_added}}</p>
+            <p>
+              <i class="fa fa-user"></i> 
+              <a href="{% url 'web:other' i.owner.id%}">{{ i.owner }}</a> / 
+              <a href="{% url 'web:forum' i.topic.forum.id%}">{{ i.topic.forum }}</a>
+            </p> 
+          </div>
+        </li>
         {% endif %}
       {% endfor %}
   </div>
-  
+  <div style="margin-left: 40%;float: left;">
+    <nav aria-label="Page navigation">
+      <ul class="pagination">
+        {% if search_page.number > 1 %}
+        <li>
+          <a href="?page=1" aria-label="Previous">
+            <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li>
+          <a href="?page={{ search_page.previous_page_number }}" aria-label="Previous">
+            <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+          </a>
+        </li>
+        {% endif %}
+        {% if search_page.paginator.num_pages == 1 %}
+        <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+        {% endif %}
+        {% if search_page.paginator.num_pages == 2 %}
+          {% if search_page.number == 1 %}
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          {% elif search_page.number == 2 %}
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if search_page.paginator.num_pages == 3 %}
+          {% if search_page.number == 1 %}
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:2 }}">{{ search_page.number|add:2 }}</a></li>
+          {% elif search_page.number == 2 %}
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          {% elif search_page.number == 3 %}
+          <li><a href="?page={{ search_page.number|add:-2 }}">{{ search_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if search_page.paginator.num_pages == 4 %}  
+          {% if search_page.number == 1 %}
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:2 }}">{{ search_page.number|add:2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:3 }}">{{ search_page.number|add:3 }}</a></li>
+          {% elif search_page.number == 2 %}
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:2 }}">{{ search_page.number|add:2 }}</a></li>
+          {% elif search_page.number == 3 %}
+          <li><a href="?page={{ search_page.number|add:-2 }}">{{ search_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          {% elif search_page.number == 4 %}
+          <li><a href="?page={{ search_page.number|add:-3 }}">{{ search_page.number|add:-3 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-2 }}">{{ search_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if search_page.paginator.num_pages >= 5 %}  
+          {% if search_page.number == 1 %}
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:2 }}">{{ search_page.number|add:2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:3 }}">{{ search_page.number|add:3 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:4 }}">{{ search_page.number|add:4 }}</a></li>
+          {% elif search_page.number == 2 %}
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:2 }}">{{ search_page.number|add:2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:3 }}">{{ search_page.number|add:3 }}</a></li>
+          {% elif search_page.number|add:1 == search_page.paginator.num_pages %}
+          <li><a href="?page={{ search_page.number|add:-3 }}">{{ search_page.number|add:-3 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-2 }}">{{ search_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          {% elif search_page.number == search_page.paginator.num_pages %}
+          <li><a href="?page={{ search_page.number|add:-4 }}">{{ search_page.number|add:-4 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-3 }}">{{ search_page.number|add:-3 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-2 }}">{{ search_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          {% else %}
+          <li><a href="?page={{ search_page.number|add:-2 }}">{{ search_page.number|add:-2 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:-1 }}">{{ search_page.number|add:-1 }}</a></li>
+          <li><a href="?page={{ search_page.number }}" style="background-color: rgb(238,238,238);">{{ search_page.number }}</a></li>
+          <li><a href="?page={{ search_page.number|add:1 }}">{{ search_page.number|add:1 }}</a></li>
+          <li><a href="?page={{ search_page.number|add:2 }}">{{ search_page.number|add:2 }}</a></li>
+          {% endif %}
+        {% endif %}
+        {% if search_page.number < search_page.paginator.num_pages %}
+        <li>
+          <a href="?page={{ search_page.next_page_number }}" aria-label="Next">
+          <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+          </a>
+        </li>
+        <li>
+          <a href="?page={{ search_page.paginator.num_pages }}" aria-label="Next">
+            <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+          </a>
+        </li>
+        {% endif %}
+        <li style="padding-left: 10px;position: relative;top:4px;">
+          共 {{ search_page.paginator.num_pages }} 页，
+          跳转至<input type="text" id="pageNum" size="1">页
+          <button type="button" class="btn btn-default btn-sm" onclick="getPage();">
+              <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+          </button>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  <div style="height: 110px;position: fixed;bottom:-30px;right: 10%;">
+    <ul >
+      <li >
+        <div style="background-color: #337ab7;width: 50px;height: 50px;border-radius:4px;">
+          <a href="javascript:void(0)" onclick="goto_top()">
+            <i class="fa fa-chevron-up fa-2x" style="color: rgb(234,240,251);position: relative;left:11px ;top:10px"></i>
+          </a>
+        </div>
+      </li>
+    </ul>
+  </div> 
 {% endblock %}
 
 {% block js %}
 <script>
+  $(document).ready(function() {
+      var obj = $(".content_img").find("img").css({"max-height":"300px","width":"auto"});
+  });
+  function getPage() {
+        var pageNum = $('#pageNum').val();
+        if(pageNum >= 1 && pageNum <= {{ search_page.paginator.num_pages }} ){
+          var wd = $('#search').val();
+            location.assign("/search/" + wd + "/?page="+pageNum);
+        }
+        else{
+            alert('请输入正确的页码!');
+        }
+    }
   // $(document).ready(function() {
-  //   var br = $("#search").val();
+  //   var obj1 = $("body").find("input");
+  //   for (var j = 1; j <= obj1.length; j += 1){
+  //     var br = $("#search_" + j).val();
   //     var af = '<span style="color:red;display: inline-block;">' + br + '</span>';
   //     var obj = $(".search").find("span");
   //     for (var i = 0; i < obj.length; i += 1) {
@@ -43,6 +259,7 @@
   //       str = str.replace(br,af);
   //       obj[i].outerHTML = str;
   //     }
+  //   }
   // });
 </script>
 {% endblock %}

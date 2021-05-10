@@ -1,6 +1,6 @@
 {% extends 'layout/basic.html' %}
 {% load static %}
-{% block title %}帖子{% endblock %}
+{% block title %}{{ topic.topic_text }}{% endblock %}
 
 {% block css %}
 <!-- <link rel="stylesheet" href="{% static 'css/topic.css' %}"> -->
@@ -161,14 +161,14 @@ img.comment_head{
 		<div class="collect">
 			{% if topic.forum.moderator == request.user %}
 				{% if topic.top %}
-				<a id="top" href="javascript:unTop({{ topic.id }});">取消置顶</a>&nbsp;
+				<a id="top" href="javascript:void(0)" onclick="unTop({{ topic.id }});">取消置顶</a>&nbsp;
 				{% else %}
-				<a id="top" href="javascript:Top({{ topic.id }});">置顶</a>&nbsp;
+				<a id="top" href="javascript:void(0)" onclick="Top({{ topic.id }});">置顶</a>&nbsp;
 				{% endif %}
 				{% if topic.refined %}
-				<a id="refined" href="javascript:unRefined({{ topic.id }});">取消加精</a>&nbsp;
+				<a id="refined" href="javascript:void(0)" onclick="unRefined({{ topic.id }});">取消加精</a>&nbsp;
 				{% else %}
-				<a id="refined" href="javascript:Refined({{ topic.id }});">加精</a>&nbsp;
+				<a id="refined" href="javascript:void(0)" onclick="Refined({{ topic.id }});">加精</a>&nbsp;
 				{% endif %}
 			{% endif %}
 			{% if  topic.id in collect %}
@@ -418,6 +418,8 @@ img.comment_head{
         <form action="{% url 'web:topic' topic.id%}" method="post">
           {% csrf_token %}
           {% for field in form %}
+            <label for="id_{{ field.name }}"></label>
+              <span class="label label-danger" style="font-size: 18px;">{{ field.errors.0 }}</span>
             {{ field }}
           {% endfor %}
           <button name="submit" style="margin-top: 5px;">发表</button>
@@ -426,7 +428,7 @@ img.comment_head{
       </div>
   </div>
 </div>
-<div style="height: 110px;position: fixed;top:50%;right: 10%;">
+<div style="height: 110px;position: fixed;bottom:5%;right: 10%;">
   <ul >
     <li style="padding-bottom: 10px"><a href="#form">
       <img src="{% static 'img/write.png' %}" style="width: 50px;">
@@ -451,9 +453,9 @@ img.comment_head{
     $("#forum").show();
     $("#forum").text("{{ topic.forum.forum_name }}");
     $("#forum").attr("href","{% url 'web:forum' topic.forum.id %}");
-    $("#topic").show();
-    $("#topic").text("{{ topic.topic_text|slice:':10' }}");
-    $("#topic").attr("href","{% url 'web:topic' topic.id %}");
+    // $("#topic").show();
+    // $("#topic").text("{{ topic.topic_text|slice:':8' }}");
+    // $("#topic").attr("href","{% url 'web:topic' topic.id %}");
 	function getPage() {
         var pageNum = $('#pageNum').val();
         if(pageNum >= 1 && pageNum <= {{ floors_page.paginator.num_pages }}){

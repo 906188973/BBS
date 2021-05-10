@@ -18,7 +18,7 @@
       <div class="clearfix">
         <div class="col-md-6" style="padding-left:0">
           {{field}}
-          <span class="error-msg">{{ field.errors.0 }}</span>
+          <span class="error-msg" style="font-size: 12px;">{{ field.errors.0 }}</span>
         </div>
         <div class="col-md-6">
           <img src="{% url 'web:image_code' %}" id="imageCode" title="点击更换图片">
@@ -29,7 +29,7 @@
     <div class="form-group">
       <label for="{{field.id_for_label}}">{{field.label}}</label>
       {{field}}
-      <span class="error-msg">{{ field.errors.0 }}</span>
+      <span class="error-msg" style="font-size: 12px;">{{ field.errors.0 }}</span>
     </div>
     {% endif %}
     {% endfor %}

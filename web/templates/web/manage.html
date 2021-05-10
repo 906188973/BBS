@@ -105,7 +105,7 @@
           <ul class="nav nav-pills nav-stacked" >
             <li role="presentation" class="active"><a href="{% url 'web:manage' %}">消息中心</a></li>
               <li role="presentation"><a href="{% url 'web:manage_topic' %}">帖子管理</a></li>
-              <li role="presentation"><a href="{% url 'web:manage_comment' %}">回复管理</a></li>
+              <li role="presentation"><a href="{% url 'web:manage_floor' %}">回复管理</a></li>
               {% if request.user.power == 3 %}
               <li role="presentation"><a href="{% url 'web:manage_forum' %}">版块管理</a></li>
               <li role="presentation"><a href="{% url 'web:manage_user' %}">用户管理</a></li>

@@ -50,14 +50,159 @@
 {% block content %}
     <h1 style="padding-left: 20px;">管理中心</h1>
     <div style="width: 70%;padding-left: 20px;float: left;">
-
+      <div class="message">
+        <h2>用户管理</h2>
+        <table class="table table-condensed">
+          <tr class="messagecontent">
+              <th>id</th>
+              <th>用户名</th>
+              <th>邮箱</th>
+              <th>手机号码</th>
+              <th>用户级别</th>
+              <th>个性签名</th>
+              <th>操作</th>
+          </tr>
+        {% for user in user_page %}
+          <tr class="messagecontent" id='user_{{ user.id }}'>
+            <td>{{ user.id }}</td>
+            <td><a href="{% url 'web:other' user.id %}">{{ user.username }}</a></td>
+            <td>{{ user.email }}</td>
+            <td>{{ user.mobile_phone }}</td>
+            <td>{{ user.power_name }}</td>
+            <td>{{ user.describe }}</td>
+            <td><a href="javascript:void(0)" onclick="userDel({{ user.id }})">删除</a></td>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
+      <div style="margin-left: 33%;">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if user_page.number > 1 %}
+            <li>
+              <a href="?page=1" aria-label="Previous">
+                <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+              </a>
+            </li>
+            <li>
+              <a href="?page={{ user_page.previous_page_number }}" aria-label="Previous">
+                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+              </a>
+            </li>
+            {% endif %}
+            {% if user_page.paginator.num_pages == 1 %}
+            <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+            {% endif %}
+            {% if user_page.paginator.num_pages == 2 %}
+              {% if user_page.number == 1 %}
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              {% elif user_page.number == 2 %}
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if user_page.paginator.num_pages == 3 %}
+              {% if user_page.number == 1 %}
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:2 }}">{{ user_page.number|add:2 }}</a></li>
+              {% elif user_page.number == 2 %}
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              {% elif user_page.number == 3 %}
+              <li><a href="?page={{ user_page.number|add:-2 }}">{{ user_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if user_page.paginator.num_pages == 4 %}  
+              {% if user_page.number == 1 %}
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:2 }}">{{ user_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:3 }}">{{ user_page.number|add:3 }}</a></li>
+              {% elif user_page.number == 2 %}
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:2 }}">{{ user_page.number|add:2 }}</a></li>
+              {% elif user_page.number == 3 %}
+              <li><a href="?page={{ user_page.number|add:-2 }}">{{ user_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              {% elif user_page.number == 4 %}
+              <li><a href="?page={{ user_page.number|add:-3 }}">{{ user_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-2 }}">{{ user_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if user_page.paginator.num_pages >= 5 %}  
+              {% if user_page.number == 1 %}
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:2 }}">{{ user_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:3 }}">{{ user_page.number|add:3 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:4 }}">{{ user_page.number|add:4 }}</a></li>
+              {% elif user_page.number == 2 %}
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:2 }}">{{ user_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:3 }}">{{ user_page.number|add:3 }}</a></li>
+              {% elif user_page.number|add:1 == user_page.paginator.num_pages %}
+              <li><a href="?page={{ user_page.number|add:-3 }}">{{ user_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-2 }}">{{ user_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              {% elif user_page.number == user_page.paginator.num_pages %}
+              <li><a href="?page={{ user_page.number|add:-4 }}">{{ user_page.number|add:-4 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-3 }}">{{ user_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-2 }}">{{ user_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              {% else %}
+              <li><a href="?page={{ user_page.number|add:-2 }}">{{ user_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:-1 }}">{{ user_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ user_page.number }}" style="background-color: rgb(238,238,238);">{{ user_page.number }}</a></li>
+              <li><a href="?page={{ user_page.number|add:1 }}">{{ user_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ user_page.number|add:2 }}">{{ user_page.number|add:2 }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if user_page.number < user_page.paginator.num_pages %}
+            <li>
+              <a href="?page={{ user_page.next_page_number }}" aria-label="Next">
+              <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+              </a>
+            </li>
+            <li>
+              <a href="?page={{ user_page.paginator.num_pages }}" aria-label="Next">
+                <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+              </a>
+            </li>
+            {% endif %}
+            <li style="padding-left: 10px;position: relative;top:4px;">
+              {{ count }} 条用户数据 ，
+              共 {{ floor_page.paginator.num_pages }} 页，
+              跳转至<input type="text" id="pageNum" size="1">页
+              <button type="button" class="btn btn-default btn-sm" onclick="getPage();">
+                  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
     <div id="box">  
       <div id="float" class="div1">
           <ul class="nav nav-pills nav-stacked" >
             <li role="presentation"><a href="{% url 'web:manage' %}">消息中心</a></li>
               <li role="presentation"><a href="{% url 'web:manage_topic' %}">帖子管理</a></li>
-              <li role="presentation"><a href="{% url 'web:manage_comment' %}">回复管理</a></li>
+              <li role="presentation"><a href="{% url 'web:manage_floor' %}">回复管理</a></li>
               {% if request.user.power == 3 %}
               <li role="presentation"><a href="{% url 'web:manage_forum' %}">版块管理</a></li>
               <li role="presentation" class="active"><a href="{% url 'web:manage_user' %}">用户管理</a></li>
@@ -132,5 +277,30 @@ function goto_top() {
         };   
     }   
 })(); 
+function getPage() {
+        var pageNum = $('#pageNum').val();
+        if(pageNum >= 1 && pageNum <= {{ user_page.paginator.num_pages }} ){
+            location.assign("{% url 'web:manage_user' %}?page="+pageNum);
+        }
+        else{
+            alert('请输入正确的页码!');
+        }
+    }
+function userDel(id) {
+  var flag = confirm("您真的确定要删除吗？")
+  if(flag){
+    $.ajax({
+        url: '/user_del/'+ id + '/',
+        type: "POST",
+        data: {id:id},
+        dataType: "JSON",
+        success: function (res) {
+            if(res.status){
+            $('#user_'+id).remove();
+            }
+        }
+    })
+  }
+}
   </script>
 {% endblock %}

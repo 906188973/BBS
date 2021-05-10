@@ -6,8 +6,8 @@ from ckeditor_uploader.widgets import CKEditorUploadingWidget
 
 class ForumForm(forms.ModelForm):
     forum_name = forms.CharField(label='版块名')
-    picture = forms.ImageField(label='头像')
-    background = forms.ImageField(label='头像')
+    picture = forms.ImageField(label='logo')
+    background = forms.ImageField(label='背景')
 
     class Meta:
         model = ApplyforForum
@@ -24,12 +24,10 @@ class ForumForm(forms.ModelForm):
 
     def clean_picture(self):
         picture = self.cleaned_data['picture']
-        print(self.cleaned_data['picture'])
         return picture
 
     def clean_background(self):
         background = self.cleaned_data['background']
-        print(self.cleaned_data['background'])
         return background
 
 class TopicForm(forms.ModelForm):
@@ -40,16 +38,19 @@ class TopicForm(forms.ModelForm):
         widgets = {'topic_text': forms.TextInput(attrs={'style': "width: 756.68px;"})}
 
 class FloorForm(forms.Form):
-    floor_text = forms.CharField(widget=CKEditorUploadingWidget(config_name='comment_ckeditor'))
+    floor_text = forms.CharField(error_messages={ "required": "内容不能为空"}, widget=CKEditorUploadingWidget(config_name='comment_ckeditor'))
 
     # class Meta:
     #     model = Floor
     #     fields = ['floor_text']
     #     labels = {'floor_text': ''}
     #     widgets = {'floor_text': forms.Textarea(attrs={'cols': 115, 'style': "resize:none"})}
-    def clean_floor_text(self):
-        floor_text = self.cleaned_data['floor_text']
-        return floor_text
+    # def clean_floor_text(self):
+    #     floor_text = self.cleaned_data['floor_text']
+    #     if floor_text:
+    #         return floor_text
+    #     else:
+    #         raise ValidationError('输入不能为空')
 
 class TopicchangeForm(forms.ModelForm):
     class Meta:

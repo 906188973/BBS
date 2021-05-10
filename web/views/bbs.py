@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from web.form.bbs import ForumForm, TopicForm, FloorForm
-from django.http import JsonResponse, HttpResponseRedirect
+from django.http import JsonResponse, HttpResponseRedirect, HttpResponse
 from web.models import Topic, Forum, Floor, Comment, UserToForum, Collect, UserInfo, ForumPower
 from web.models import FloorGreat, CommentGreat, ApplyforForum
+from web import models
 from django.db.models import Max
 from django.urls import reverse
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage, InvalidPage
@@ -14,14 +15,24 @@ def applyforforum(request):
     """申请版块"""
     if request.method == 'POST':
         form = ForumForm(request.POST, request.FILES)
-        print(request.POST)
         if form.is_valid():
             forum = form.save(commit=False)
             forum.user = request.user
             forum.save()
-            return JsonResponse({'status': True})
+            # return JsonResponse({'status': True})
+            return redirect('web:home')
         # return redirect('web:home')
-        return JsonResponse({'status': False, 'error': form.errors})
+        # return JsonResponse({'status': False, 'error': form.errors})
+        forums = Forum.objects.order_by('date_added')
+        obj = Topic.objects.order_by('-floor_count')[:20]
+        forum = models.UserToForum.objects.filter(user=request.user)
+        user_forum = []
+        for i in forum:
+            user_forum.append(i.forum.id)
+        usertouser = models.UserToUser.objects.filter(user=request.user)
+        context = {'forums': forums, 'hottopic': obj, 'form': form, 'user_forum': user_forum}
+        context['usertouser'] = usertouser
+        return render(request, 'web/home.html', context)
 
 def create_forum(request, id):
     """创建版块"""
@@ -54,7 +65,8 @@ def fourm(request, forum_id):
     forum = Forum.objects.get(id=forum_id)
     topics = forum.topic_set.order_by('-top', 'date_added')
     obj = UserToForum.objects.filter(user=request.user, status=True).all()
-
+    form_topic = TopicForm()
+    form_floor = FloorForm()
     # 将数据按照规定每页显示 10 条, 进行分割
     paginator = Paginator(topics, 20)
 
@@ -62,27 +74,7 @@ def fourm(request, forum_id):
     for i in obj:
         user_forum.append(i.forum.id)
     """创建新贴"""
-    if request.method != 'POST':
-        form_topic = TopicForm()
-        form_floor = FloorForm()
-        topic_count = 0
-        for i in topics:
-            topic_count += i.floor_count
-        # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
-        page = request.GET.get('page')
-        try:
-            topic_page = paginator.page(page)
-        # todo: 注意捕获异常
-        except PageNotAnInteger:
-            # 如果请求的页数不是整数, 返回第一页。
-            topic_page = paginator.page(1)
-        except InvalidPage:
-            # 如果请求的页数不存在, 重定向页面
-            return HttpResponse('找不到页面的内容')
-        except EmptyPage:
-            # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
-            topic_page = paginator.page(paginator.num_pages)
-    else:
+    if request.method == 'POST':
         form_topic = TopicForm(request.POST)
         form_floor = FloorForm(request.POST)
         if form_topic.is_valid() and form_floor.is_valid():
@@ -103,7 +95,25 @@ def fourm(request, forum_id):
             forum.topic_count += 1
             forum.save()
             # return redirect('web:forum', args=[forum_id])
-            return HttpResponseRedirect(reverse('web:forum', args=[forum_id]))
+            return HttpResponseRedirect(reverse('web:topic', args=[topic.id]))
+
+    topic_count = 0
+    for i in topics:
+        topic_count += i.floor_count
+    # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+    page = request.GET.get('page')
+    try:
+        topic_page = paginator.page(page)
+    # todo: 注意捕获异常
+    except PageNotAnInteger:
+        # 如果请求的页数不是整数, 返回第一页。
+        topic_page = paginator.page(1)
+    except InvalidPage:
+        # 如果请求的页数不存在, 重定向页面
+        return HttpResponse('找不到页面的内容')
+    except EmptyPage:
+        # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+        topic_page = paginator.page(paginator.num_pages)
     context = {'forum': forum, 'form_topic': form_topic, 'form_floor': form_floor, 'topic_page':topic_page}
     context['user_forum'] = user_forum
     context['topic_count'] = topic_count
@@ -127,6 +137,7 @@ def topic(request, topic_id):
     topic = Topic.objects.get(id=topic_id)
     floors = topic.floor_set.order_by('date_added')
     obj = Collect.objects.filter(user=request.user, status=True).all()
+    form = FloorForm()
     collect = []
     for i in obj:
         collect.append(i.topic.id)
@@ -146,25 +157,9 @@ def topic(request, topic_id):
     for i in obj:
         commentgreat.append(i.comment.id)
 
-    paginator = Paginator(floors, 20)
+    paginator = Paginator(floors, 10)
     """回复帖子"""
-    if request.method != 'POST':
-        form = FloorForm()
-        # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
-        page = request.GET.get('page')
-        try:
-            floors_page = paginator.page(page)
-        # todo: 注意捕获异常
-        except PageNotAnInteger:
-            # 如果请求的页数不是整数, 返回第一页。
-            floors_page = paginator.page(1)
-        except InvalidPage:
-            # 如果请求的页数不存在, 重定向页面
-            return HttpResponse('找不到页面的内容')
-        except EmptyPage:
-            # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
-            floors_page = paginator.page(paginator.num_pages)
-    else:
+    if request.method == 'POST':
         form = FloorForm(data=request.POST)
         if form.is_valid():
             obj = Floor.objects.filter(topic=topic).aggregate(max=Max('floor_number'))
@@ -181,6 +176,20 @@ def topic(request, topic_id):
 
             # return redirect('web:topic', args=[topic_id])
             return HttpResponseRedirect(reverse('web:topic', args=[topic_id]))
+    # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+    page = request.GET.get('page')
+    try:
+        floors_page = paginator.page(page)
+        # todo: 注意捕获异常
+    except PageNotAnInteger:
+    # 如果请求的页数不是整数, 返回第一页。
+        floors_page = paginator.page(1)
+    except InvalidPage:
+        # 如果请求的页数不存在, 重定向页面
+        return HttpResponse('找不到页面的内容')
+    except EmptyPage:
+        # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+        floors_page = paginator.page(paginator.num_pages)
     context = {'topic': topic, 'floors': floors, 'form': form}
     context['collect'] = collect
     context['floorgreat'] = floorgreat
@@ -462,10 +471,51 @@ def search(request, wd):
         forum += Forum.objects.filter(forum_name__icontains=wd)
         topic += Topic.objects.filter(topic_text__icontains=wd)
         floor += Floor.objects.filter(floor_text__icontains=wd)
-    forum = list(set(forum))
+    forums = list(set(forum))
     topic = list(set(topic))
     floor = list(set(floor))
     search = sorted(chain(topic, floor), key=attrgetter('date_added'), reverse=True)
-    print(wd_list)
-    context = {'forum': forum, 'search': search, 'wd_list': wd_list}
+
+    paginator = Paginator(search, 20)
+    # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+    page = request.GET.get('page')
+    try:
+        search_page = paginator.page(page)
+    # todo: 注意捕获异常
+    except PageNotAnInteger:
+        # 如果请求的页数不是整数, 返回第一页。
+        search_page = paginator.page(1)
+    except InvalidPage:
+        # 如果请求的页数不存在, 重定向页面
+        return HttpResponse('找不到页面的内容')
+    except EmptyPage:
+        # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+        search_page = paginator.page(paginator.num_pages)
+    context = {'forums': forums, 'search_page': search_page, 'wd': wd}
     return render(request, 'web/search.html', context)
+
+def message(request):
+    """消息"""
+    comment = models.Comment.objects.filter(by_owner=request.user)
+    topic = models.Topic.objects.filter(owner=request.user)
+    floors = []
+    for i in topic:
+        floors += i.floor_set.all()
+    messages = sorted(chain(comment, floors), key=attrgetter('date_added'), reverse=True)
+    paginator = Paginator(messages, 20)
+    # 获取 url 后面的 page 参数的值, 首页不显示 page 参数, 默认值是 1
+    page = request.GET.get('page')
+    try:
+        messages_page = paginator.page(page)
+    # todo: 注意捕获异常
+    except PageNotAnInteger:
+        # 如果请求的页数不是整数, 返回第一页。
+        messages_page = paginator.page(1)
+    except InvalidPage:
+        # 如果请求的页数不存在, 重定向页面
+        return HttpResponse('找不到页面的内容')
+    except EmptyPage:
+        # 如果请求的页数不在合法的页数范围内，返回结果的最后一页。
+        messages_page = paginator.page(paginator.num_pages)
+    context = {'messages_page': messages_page}
+    return render(request, 'web/message.html', context)

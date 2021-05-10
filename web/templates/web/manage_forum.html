@@ -50,14 +50,161 @@
 {% block content %}
     <h1 style="padding-left: 20px;">管理中心</h1>
     <div style="width: 70%;padding-left: 20px;float: left;">
-
+      <div class="message">
+        <h2>版块管理</h2>
+        <table class="table table-condensed">
+          <tr class="messagecontent">
+              <th>id</th>
+              <th>版块名</th>
+              <th>帖子数</th>
+              <th>关注数</th>
+              <th>创建时间</th>
+              <th>版主</th>
+              <th>操作</th>
+          </tr>
+        {% for forum in forum_page %}
+          <tr class="messagecontent" id='forum_{{ forum.id }}'>
+            <td>{{ forum.id }}</td>
+            <td><a href="{% url 'web:forum' forum.id %}">{{ forum.forum_name }}</a></td>
+            <td>{{ forum.topic_count }}</td>
+            <td>{{ forum.concern_count }}</td>
+            <td>{{ forum.date_added }}</td>
+            <td>
+              <a href="{% url 'web:other' forum.moderator.id %}">{{ forum.moderator }}</a>
+            </td>
+            <td><a href="javascript:void(0)" onclick="forumDel({{ forum.id }})">删除</a></td>
+          </tr>
+        {% endfor %}
+        </table>
+      </div>
+      <div style="margin-left: 33%;">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if forum_page.number > 1 %}
+            <li>
+              <a href="?page=1" aria-label="Previous">
+                <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+              </a>
+            </li>
+            <li>
+              <a href="?page={{ forum_page.previous_page_number }}" aria-label="Previous">
+                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+              </a>
+            </li>
+            {% endif %}
+            {% if forum_page.paginator.num_pages == 1 %}
+            <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+            {% endif %}
+            {% if forum_page.paginator.num_pages == 2 %}
+              {% if forum_page.number == 1 %}
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              {% elif forum_page.number == 2 %}
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if forum_page.paginator.num_pages == 3 %}
+              {% if forum_page.number == 1 %}
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:2 }}">{{ forum_page.number|add:2 }}</a></li>
+              {% elif forum_page.number == 2 %}
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              {% elif forum_page.number == 3 %}
+              <li><a href="?page={{ forum_page.number|add:-2 }}">{{ forum_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if forum_page.paginator.num_pages == 4 %}  
+              {% if forum_page.number == 1 %}
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:2 }}">{{ forum_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:3 }}">{{ forum_page.number|add:3 }}</a></li>
+              {% elif forum_page.number == 2 %}
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:2 }}">{{ forum_page.number|add:2 }}</a></li>
+              {% elif forum_page.number == 3 %}
+              <li><a href="?page={{ forum_page.number|add:-2 }}">{{ forum_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              {% elif forum_page.number == 4 %}
+              <li><a href="?page={{ forum_page.number|add:-3 }}">{{ forum_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-2 }}">{{ forum_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if forum_page.paginator.num_pages >= 5 %}  
+              {% if forum_page.number == 1 %}
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:2 }}">{{ forum_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:3 }}">{{ forum_page.number|add:3 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:4 }}">{{ forum_page.number|add:4 }}</a></li>
+              {% elif forum_page.number == 2 %}
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:2 }}">{{ forum_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:3 }}">{{ forum_page.number|add:3 }}</a></li>
+              {% elif forum_page.number|add:1 == forum_page.paginator.num_pages %}
+              <li><a href="?page={{ forum_page.number|add:-3 }}">{{ forum_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-2 }}">{{ forum_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              {% elif forum_page.number == forum_page.paginator.num_pages %}
+              <li><a href="?page={{ forum_page.number|add:-4 }}">{{ forum_page.number|add:-4 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-3 }}">{{ forum_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-2 }}">{{ forum_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              {% else %}
+              <li><a href="?page={{ forum_page.number|add:-2 }}">{{ forum_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:-1 }}">{{ forum_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ forum_page.number }}" style="background-color: rgb(238,238,238);">{{ forum_page.number }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:1 }}">{{ forum_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ forum_page.number|add:2 }}">{{ forum_page.number|add:2 }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if forum_page.number < forum_page.paginator.num_pages %}
+            <li>
+              <a href="?page={{ forum_page.next_page_number }}" aria-label="Next">
+              <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+              </a>
+            </li>
+            <li>
+              <a href="?page={{ forum_page.paginator.num_pages }}" aria-label="Next">
+                <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+              </a>
+            </li>
+            {% endif %}
+            <li style="padding-left: 10px;position: relative;top:4px;">
+              {{ count }} 条版块数据 ，
+              共 {{ floor_page.paginator.num_pages }} 页，
+              跳转至<input type="text" id="pageNum" size="1">页
+              <button type="button" class="btn btn-default btn-sm" onclick="getPage();">
+                  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
     <div id="box">  
       <div id="float" class="div1">
           <ul class="nav nav-pills nav-stacked" >
             <li role="presentation"><a href="{% url 'web:manage' %}">消息中心</a></li>
               <li role="presentation"><a href="{% url 'web:manage_topic' %}">帖子管理</a></li>
-              <li role="presentation"><a href="{% url 'web:manage_comment' %}">回复管理</a></li>
+              <li role="presentation"><a href="{% url 'web:manage_floor' %}">回复管理</a></li>
               {% if request.user.power == 3 %}
               <li role="presentation" class="active"><a href="{% url 'web:manage_forum' %}">版块管理</a></li>
               <li role="presentation"><a href="{% url 'web:manage_user' %}">用户管理</a></li>
@@ -132,5 +279,30 @@ function goto_top() {
         };   
     }   
 })(); 
+function getPage() {
+        var pageNum = $('#pageNum').val();
+        if(pageNum >= 1 && pageNum <= {{ forum_page.paginator.num_pages }} ){
+            location.assign("{% url 'web:manage_forum' %}?page="+pageNum);
+        }
+        else{
+            alert('请输入正确的页码!');
+        }
+    }
+function forumDel(id) {
+  var flag = confirm("您真的确定要删除吗？")
+  if(flag){
+    $.ajax({
+        url: '/forum_del/'+ id + '/',
+        type: "POST",
+        data: {id:id},
+        dataType: "JSON",
+        success: function (res) {
+            if(res.status){
+            $('#forum_'+id).remove();
+            }
+        }
+    })
+  }
+} 
   </script>
 {% endblock %}

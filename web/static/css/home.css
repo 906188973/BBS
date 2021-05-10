@@ -19,6 +19,9 @@
     width: 800px;
     float: left;
 }
+.forums img{
+  max-height: 200px;
+}
 .aconcerned{
     float: right;
     color: black;
@@ -42,9 +45,9 @@
   right: 40px;
 }
 .tag{
-  padding-bottom: 5px;
+  padding-bottom: 10px;
 }
-.taga{
+.tag>a{
   font-size: 18px;
   display: inline-block;
   width: 150px;
@@ -77,8 +80,7 @@
   border-bottom: 1px solid #ddd;
   position: relative;
   right: 45px;
-  top:10px
-  
+  top:10px;
 }
 .hottopic:hover{
   background-color: rgb(240,240,240);

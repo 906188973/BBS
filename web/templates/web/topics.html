@@ -284,7 +284,10 @@
         {% csrf_token %}
         {{ form_topic.as_p }}
         {% for field in form_floor %}
+          <label for="id_{{ field.name }}"></label>
+          <span class="label label-danger" style="font-size: 18px;">{{ field.errors.0 }}</span>
           {{ field }}
+          
         {% endfor %}
         <button name="submit" style="margin-top: 5px;">发表</button>
         <a name="form"></a>
@@ -292,7 +295,7 @@
     </div>
   </div>
 </div>
-<div style="height: 110px;position: fixed;top:50%;right: 10%;">
+<div style="height: 110px;position: fixed;bottom:5%;right: 10%;">
   <ul >
     <li style="padding-bottom: 10px"><a href="#form">
       <img src="{% static 'img/write.png' %}" style="width: 50px;">
@@ -405,5 +408,8 @@
             alert('请输入正确的页码!');
         }
       }
+      $(document).ready(function() {
+      var obj = $(".content_img").find("img").css({"max-height":"300px","width":"auto"});
+  });
   </script>
 {% endblock%}

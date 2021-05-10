@@ -1,5 +1,5 @@
 {% extends 'layout/basic.html' %}
-
+{% load static %}
 {% block title %}用户登录{% endblock %}
 
 {% block css %}
@@ -18,7 +18,7 @@
       <div class="clearfix">
         <div class="col-md-6" style="padding-left:0">
           {{field}}
-          <span class="error-msg"></span>
+          <span class="error-msg" style="font-size: 12px;"></span>
         </div>
         <div class="col-md-6">
           <input id="btnSms" type="button" class="btn btn-default" value='点击获取验证码'>
@@ -29,7 +29,7 @@
     <div class="form-group">
       <label for="{{field.id_for_label}}">{{field.label}}</label>
       {{field}}
-      <span class="error-msg"></span>
+      <span class="error-msg" style="font-size: 12px;"></span>
     </div>
     {% endif %}
     {% endfor %}

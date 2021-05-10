@@ -23,6 +23,7 @@
     .error-msg{
       color:red;
       position:absolute;
+      font-size:12px ;
     }
     .logo{
       width: 150px;
@@ -45,6 +46,9 @@
     ul{
       list-style: none;
     }
+    li{
+list-style-type:none;
+}
     a{
       color: black;
     }
@@ -64,7 +68,7 @@
 <body>
 <nav class="navbar navbar-default" style="background:linear-gradient(89deg,#133c81 5%,#3672bb 48%,#133c81 95%);">
   <div class="container">
-    <!-- Brand and toggle get grouped for better mobile display -->
+    
     <div class="navbar-header">
       <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
         <span class="sr-only">Toggle navigation</span>
@@ -76,7 +80,7 @@
       <a class="navbar-brand" href="{% url 'web:home' %}" style="color: white;position: relative;right: 50px;">二次元贴吧</a>
     </div>
 
-    <!-- Collect the nav links, forms, and other content for toggling -->
+   
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
         <li><a id='forum' style="display: none;color: white;relative;right: 50px;" href="#">forum</a></li>
@@ -89,7 +93,7 @@
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="color: white;background: #4171c5;">{{ request.user.username }}<span class="caret"></span></a>
             <ul class="dropdown-menu" >
               <li><a href="{% url 'web:account' %}">个人主页</a></li>
-              <li><a href="{% url 'web:account' %}">消息中心</a></li>
+              <li><a href="{% url 'web:message' %}">消息中心</a></li>
               {% if request.user.power != 1 %}
               <li><a href="{% url 'web:manage' %}">管理中心</a></li>
               {% endif %}
@@ -127,6 +131,60 @@
             window.location.href=url;
           }
         }
+        var goto_top_type = -1;  
+var goto_top_itv = 0;  
+  
+function goto_top_timer() {  
+    var y = goto_top_type == 1 ? document.documentElement.scrollTop  
+            : document.body.scrollTop;  
+    var moveby = 15;  
+    y -= Math.ceil(y * moveby / 100);  
+    if (y < 0) {  
+        y = 0;  
+    }  
+    if (goto_top_type == 1) {  
+        document.documentElement.scrollTop = y;  
+    } else {  
+        document.body.scrollTop = y;  
+    }  
+    if (y == 0) {  
+        clearInterval(goto_top_itv);  
+        goto_top_itv = 0;  
+    }  
+}  
+  
+function goto_top() {  
+    if (goto_top_itv == 0) {  
+        if (document.documentElement && document.documentElement.scrollTop) {  
+            goto_top_type = 1;  
+        } else if (document.body && document.body.scrollTop) {  
+            goto_top_type = 2;  
+        } else {  
+            goto_top_type = 0;  
+        }  
+        if (goto_top_type > 0) {  
+            goto_top_itv = setInterval('goto_top_timer()', 50);  
+        }  
+    }  
+} 
+$(document).ready(function() {
+      var obj = $(".content_img").find("img").css({"max-height":"300px","width":"auto"});
+  });
+  (function(){   
+    var oDiv=document.getElementById("float");   
+    var H=0,iE6;   
+    var Y=oDiv;   
+    while(Y){H+=Y.offsetTop;Y=Y.offsetParent};   
+    iE6=window.ActiveXObject&&!window.XMLHttpRequest;   
+    if(!iE6){   
+        window.onscroll=function()   
+        {   
+            var s=document.body.scrollTop||document.documentElement.scrollTop;   
+            if(s>H){oDiv.className="div1 div2";if(iE6){oDiv.style.top=(s-H)+"px";}}   
+            else{oDiv.className="div1";}       
+        };   
+    }   
+})(); 
     </script>
     {% block js %}{% endblock %}
 </body>

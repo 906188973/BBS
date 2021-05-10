@@ -63,12 +63,16 @@
               <th>是否加精</th>
               <th>操作</th>
           </tr>
-        {% for topic in topics %}
-          <tr class="messagecontent">
+        {% for topic in topic_page %}
+          <tr class="messagecontent" id='topic_{{ topic.id }}'>
             <td>{{ topic.id }}</td>
             <td>{{ topic.topic_text }}</td>
-            <td>{{ topic.forum }}</td>
-            <td>{{ topic.owner }}</td>
+            <td>
+              <a href="{% url 'web:forum' topic.forum.id %}">{{ topic.forum }}</a>
+            </td>
+            <td>
+              <a href="{% url 'web:other' topic.owner.id %}">{{ topic.owner }}</a>
+            </td>
             <td>{{ topic.date_added }}</td>
             <td>
               {% if topic.top %}
@@ -79,11 +83,140 @@
               {{ topic.top }}
               </a>
             </td>
-            <td>{{ topic.refined }}</td>
-            <td><a href="javascript:void(0)" onclick="floorGreat({{ topic.id }})">删除</a></td>
+            <td>
+              {% if topic.refined %}
+              <a id="refined_{{ topic.id }}" href="javascript:void(0)" onclick="unRefined({{ topic.id }});">
+              {% else %}
+              <a id="refined_{{ topic.id }}" href="javascript:void(0)" onclick="Refined({{ topic.id }});">
+              {% endif %}
+              {{ topic.refined }}
+              </a>
+            </td>
+            <td><a href="javascript:void(0)" onclick="topicDel({{ topic.id }})">删除</a></td>
           </tr>
         {% endfor %}
         </table>
+      </div>
+      <div style="margin-left: 33%;">
+        <nav aria-label="Page navigation">
+          <ul class="pagination">
+            {% if topic_page.number > 1 %}
+            <li>
+              <a href="?page=1" aria-label="Previous">
+                <span class="glyphicon glyphicon-fast-backward" aria-hidden="true"></span>
+              </a>
+            </li>
+            <li>
+              <a href="?page={{ topic_page.previous_page_number }}" aria-label="Previous">
+                <span class="glyphicon glyphicon-triangle-left" aria-hidden="true"></span>
+              </a>
+            </li>
+            {% endif %}
+            {% if topic_page.paginator.num_pages == 1 %}
+            <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+            {% endif %}
+            {% if topic_page.paginator.num_pages == 2 %}
+              {% if topic_page.number == 1 %}
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              {% elif topic_page.number == 2 %}
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if topic_page.paginator.num_pages == 3 %}
+              {% if topic_page.number == 1 %}
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:2 }}">{{ topic_page.number|add:2 }}</a></li>
+              {% elif topic_page.number == 2 %}
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              {% elif topic_page.number == 3 %}
+              <li><a href="?page={{ topic_page.number|add:-2 }}">{{ topic_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if topic_page.paginator.num_pages == 4 %}  
+              {% if topic_page.number == 1 %}
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:2 }}">{{ topic_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:3 }}">{{ topic_page.number|add:3 }}</a></li>
+              {% elif topic_page.number == 2 %}
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:2 }}">{{ topic_page.number|add:2 }}</a></li>
+              {% elif topic_page.number == 3 %}
+              <li><a href="?page={{ topic_page.number|add:-2 }}">{{ topic_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              {% elif topic_page.number == 4 %}
+              <li><a href="?page={{ topic_page.number|add:-3 }}">{{ topic_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-2 }}">{{ topic_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if topic_page.paginator.num_pages >= 5 %}  
+              {% if topic_page.number == 1 %}
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:2 }}">{{ topic_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:3 }}">{{ topic_page.number|add:3 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:4 }}">{{ topic_page.number|add:4 }}</a></li>
+              {% elif topic_page.number == 2 %}
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:2 }}">{{ topic_page.number|add:2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:3 }}">{{ topic_page.number|add:3 }}</a></li>
+              {% elif topic_page.number|add:1 == topic_page.paginator.num_pages %}
+              <li><a href="?page={{ topic_page.number|add:-3 }}">{{ topic_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-2 }}">{{ topic_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              {% elif topic_page.number == topic_page.paginator.num_pages %}
+              <li><a href="?page={{ topic_page.number|add:-4 }}">{{ topic_page.number|add:-4 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-3 }}">{{ topic_page.number|add:-3 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-2 }}">{{ topic_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              {% else %}
+              <li><a href="?page={{ topic_page.number|add:-2 }}">{{ topic_page.number|add:-2 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:-1 }}">{{ topic_page.number|add:-1 }}</a></li>
+              <li><a href="?page={{ topic_page.number }}" style="background-color: rgb(238,238,238);">{{ topic_page.number }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:1 }}">{{ topic_page.number|add:1 }}</a></li>
+              <li><a href="?page={{ topic_page.number|add:2 }}">{{ topic_page.number|add:2 }}</a></li>
+              {% endif %}
+            {% endif %}
+            {% if topic_page.number < topic_page.paginator.num_pages %}
+            <li>
+              <a href="?page={{ topic_page.next_page_number }}" aria-label="Next">
+              <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+              </a>
+            </li>
+            <li>
+              <a href="?page={{ topic_page.paginator.num_pages }}" aria-label="Next">
+                <span class="glyphicon glyphicon-fast-forward" aria-hidden="true"></span>
+              </a>
+            </li>
+            {% endif %}
+            <li style="padding-left: 10px;position: relative;top:4px;">
+               {{ count }} 条帖子数据 ，
+              共 {{ topic_page.paginator.num_pages }} 页，
+              跳转至<input type="text" id="pageNum" size="1">页
+              <button type="button" class="btn btn-default btn-sm" onclick="getPage();">
+                  <span class="glyphicon glyphicon-share-alt" aria-hidden="true"></span>
+              </button>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
     <div id="box">  
@@ -91,7 +224,7 @@
           <ul class="nav nav-pills nav-stacked" >
             <li role="presentation"><a href="{% url 'web:manage' %}">消息中心</a></li>
               <li role="presentation" class="active"><a href="{% url 'web:manage_topic' %}">帖子管理</a></li>
-              <li role="presentation"><a href="{% url 'web:manage_comment' %}">回复管理</a></li>
+              <li role="presentation"><a href="{% url 'web:manage_floor' %}">回复管理</a></li>
               {% if request.user.power == 3 %}
               <li role="presentation"><a href="{% url 'web:manage_forum' %}">版块管理</a></li>
               <li role="presentation"><a href="{% url 'web:manage_user' %}">用户管理</a></li>
@@ -99,6 +232,7 @@
           </ul>
       </div>  
     </div> 
+    
     <div style="height: 110px;position: fixed;bottom:-30px;right: 25%;">
       <ul >
         <li >
@@ -113,91 +247,33 @@
 {% endblock %}
 
 {% block js %}
+<script src="{% static 'js/manage_topic.js' %}"></script>
   <script>
-    var goto_top_type = -1;  
-var goto_top_itv = 0;  
-  
-function goto_top_timer() {  
-    var y = goto_top_type == 1 ? document.documentElement.scrollTop  
-            : document.body.scrollTop;  
-    var moveby = 15;  
-    y -= Math.ceil(y * moveby / 100);  
-    if (y < 0) {  
-        y = 0;  
-    }  
-    if (goto_top_type == 1) {  
-        document.documentElement.scrollTop = y;  
-    } else {  
-        document.body.scrollTop = y;  
-    }  
-    if (y == 0) {  
-        clearInterval(goto_top_itv);  
-        goto_top_itv = 0;  
-    }  
-}  
-  
-function goto_top() {  
-    if (goto_top_itv == 0) {  
-        if (document.documentElement && document.documentElement.scrollTop) {  
-            goto_top_type = 1;  
-        } else if (document.body && document.body.scrollTop) {  
-            goto_top_type = 2;  
-        } else {  
-            goto_top_type = 0;  
-        }  
-        if (goto_top_type > 0) {  
-            goto_top_itv = setInterval('goto_top_timer()', 50);  
-        }  
-    }  
-} 
-(function(){   
-    var oDiv=document.getElementById("float");   
-    var H=0,iE6;   
-    var Y=oDiv;   
-    while(Y){H+=Y.offsetTop;Y=Y.offsetParent};   
-    iE6=window.ActiveXObject&&!window.XMLHttpRequest;   
-    if(!iE6){   
-        window.onscroll=function()   
-        {   
-            var s=document.body.scrollTop||document.documentElement.scrollTop;   
-            if(s>H){oDiv.className="div1 div2";if(iE6){oDiv.style.top=(s-H)+"px";}}   
-            else{oDiv.className="div1";}       
-        };   
-    }   
-})(); 
-function Top(id) {
-    var pk = id
+
+function getPage() {
+        var pageNum = $('#pageNum').val();
+        if(pageNum >= 1 && pageNum <= {{ topic_page.paginator.num_pages }} ){
+            location.assign("{% url 'web:manage_topic' %}?page="+pageNum);
+        }
+        else{
+            alert('请输入正确的页码!');
+        }
+    }
+function topicDel(id) {
+  var flag = confirm("您真的确定要删除吗？")
+  if(flag){
     $.ajax({
-        url: '/top/',
+        url: '/topic_del/'+ id + '/',
         type: "POST",
-        data: {id:pk},
+        data: {id:id},
         dataType: "JSON",
         success: function (res) {
             if(res.status){
-            $('#top_'+id).text("Ture");
-            $('#top_'+id).removeAttr("onclick")
-            href = "unTob(" + pk+ ");";
-            $('#top_'+id).attr("onclick","").click(function(){unTop(id)});
+            $('#topic_'+id).remove();
             }
         }
     })
-}
-function unTop(id) {
-    var pk = id
-    $.ajax({
-        url: '/untop/',
-        type: "POST",
-        data: {id:pk},
-        dataType: "JSON",
-        success: function (res) {
-            if(res.status){
-            $('#top_'+ pk).text("False");
-            $('#top_'+id).removeAttr("onclick")
-            href = "Tob(" + pk+ ");";
-            $('#top_'+id).attr("onclick","").click(function(){Top(id)});
-            }
-        }
-    })
+  }
 }
   </script>
 {% endblock %}

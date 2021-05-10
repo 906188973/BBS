@@ -65,7 +65,7 @@ class Topic(models.Model):
         return self.topic_text[:36]
 
 class Floor(models.Model):
-    """楼层表"""
+    """回复楼层表"""
     floor_text = RichTextUploadingField()
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
@@ -79,7 +79,7 @@ class Floor(models.Model):
         return self.floor_text[:199]
 
 class Comment(models.Model):
-    """帖子回复表"""
+    """帖子评论表"""
     text = RichTextField()
     floor = models.ForeignKey(Floor, on_delete=models.CASCADE)
     owner = models.ForeignKey(UserInfo, related_name="comments", on_delete=models.DO_NOTHING)
@@ -128,3 +128,8 @@ class Inform_Floor(models.Model):
     date_added = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     status = models.BooleanField(default=False)
 
+class UserToUser(models.Model):
+    """用户关注用户表"""
+    user = models.ForeignKey(UserInfo, on_delete=models.CASCADE)
+    by_owner = models.ForeignKey(UserInfo, null=True, related_name="br", on_delete=models.DO_NOTHING)
+    status = models.BooleanField(default=True)

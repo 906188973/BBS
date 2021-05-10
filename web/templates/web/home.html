@@ -6,29 +6,85 @@
   <link rel="stylesheet" href="{% static 'css/home.css' %}">
   <style>
     .content_img img{
-  max-width: 100%;
+      height: 300px;
+      width: auto;
+ } 
+ #box{
+    position: relative;
+    right: 2px;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding-left: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 200px;
+    float: left;
+  }
+  .div1{}
+  .div2{
+    background-color: white;
+    border: 1px solid #ddd;
+    padding-left: 25px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 200px;
+    float: left;
+    position: fixed;
+    top:2%;
+    left: 257px;
+  }
+  .tagul{
+  position: relative;
+  right: 40px;
+}
+.tag{
+  padding-bottom: 10px;
+}
+.tag>a{
+  font-size: 18px;
+  display: inline-block;
+  width: 150px;
+  height: 30px;
+  background-color: rgb(52,92,161);
+  padding-left: 15px;
+  padding-right: 15px;
+  padding-top: 3px;
+  color: white;
+}
+img.comment_head{
+    width: 40px;
+    height: 40px;
 }
   </style>
 {% endblock %}
 
 {% block content %}
   <div class="content">
-    <div class="personage">
-      <div class='logo'>
-        {% if request.user.head_portrait %}
-        <img class='logo1' src='{{ request.user.head_portrait.url }}'>
+    <div id="box">
+      <div id="float" class="div1">
+        <div class='logo'>
+          {% if request.user.head_portrait %}
+          <img class='logo1' src='{{ request.user.head_portrait.url }}'>
+          {% else %}
+          <img class='logo1' src="{% static 'img/default.jpg' %}">
+          {% endif %}
+        </div>
+        {% if request.user %}
+        <div><a class="name" href="{% url 'web:account' %}">{{ request.user.username }}</a></div>
         {% else %}
-        <img class='logo1' src="{% static 'img/default.jpg' %}">
+        <div><a class="name">游客</a></div>
+        <div><a class="name" href="{% url 'web:register' %}" >注册</a></div>
         {% endif %}
+        <ul class="tagul"> 
+          <li class="tag"><a href="javascript:void(0)" onclick="switchtag('hottopic')">热门帖子</a></li>
+          <li class="tag"><a href="javascript:void(0)" onclick="switchtag('allforum')">全部版块</a></li>
+          {% if request.user %}
+          <li class="tag"><a href="javascript:void(0)" onclick="switchtag('concernedforum')">你关注的版块</a></li>
+          <li class="tag"><a href="javascript:void(0)" onclick="switchtag('collecttopic')">你收藏的帖子</a></li>
+          <li class="tag"><a href="javascript:void(0)" onclick="switchtag('concernedown')">你关注的用户</a></li>
+          {% endif %}
+        </ul>
       </div>
-      <div><a class="name" href="{% url 'web:account' %}">{{ request.user.username }}</a></div>
-      <ul class="tagul"> 
-        <li class="tag"><a class="taga" onclick="switchtag('hottopic')">热门帖子</a></li>
-        <li class="tag"><a class="taga" onclick="switchtag('allforum')">全部版块</a></li>
-        <li class="tag"><a class="taga" onclick="switchtag('concernedforum')">你关注的版块</a></li>
-        <li class="tag"><a class="taga" onclick="switchtag('collecttopic')">你收藏的帖子</a></li>
-        <li class="tag"><a class="taga" onclick="switchtag('concernedown')">你关注的用户</a></li>
-      </ul>
     </div>
     
     <div class="forums">
@@ -90,25 +146,52 @@
       </div>
       <div class="divforums" id="collecttopic">
         <h1 style="color: rgb(52,92,161);"><b>你收藏的帖子</b></h1>
-        {% for collect in request.user.collect_set.all %}
-        {% if collect.status == 1 %}
-        <div id='collect_{{ collect.topic.id }}'>
-          <a  href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
-          <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
-        </div>
-        {% endif %}
-        {% endfor %}
+        <ul>
+          {% for collect in request.user.collect_set.all %}
+          {% if collect.status == 1 %}
+          <li>
+            <div class="hottopic">
+              <a href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
+              <div class="content_img">{{ collect.topic.floor_set.first|safe }}</div>
+              <p id='collect_{{ collect.topic.id }}' style="float: right;">
+                <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
+              </p>
+              <p>
+                <i class="fa fa-user"></i> 
+                <a href="{% url 'web:other' collect.topic.floor_set.first.owner.id%}">{{ collect.topic.floor_set.first.owner }}</a> / 
+                <a href="{% url 'web:forum' collect.topic.forum.id%}">{{ collect.topic.forum }}</a>
+              </p> 
+            </div>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
       </div>
       <div class="divforums" id="concernedown">
         <h1 style="color: rgb(52,92,161);"><b>你关注的用户</b></h1>
-        {% for collect in request.user.collect_set.all %}
-        {% if collect.status == 1 %}
-        <div id='collect_{{ collect.topic.id }}'>
-          <a  href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
-          <a  href="javascript:unCollect({{ collect.topic.id }});">取消收藏</a>
-        </div>
-        {% endif %}
-        {% endfor %}
+        <ul>
+          {% for user in request.user.usertouser_set.all %}
+          {% if user.status == 1 %}
+          <li>
+            <div class="hottopic">
+              <a href="{% url 'web:other' user.by_owner.id %}">
+                {% if user.by_owner.head_portrait %}
+                  <img class='comment_head' src='{{ user.by_owner.head_portrait.url }}'>
+                  {% else %}
+                  <img class='comment_head' src="{% static 'img/default.jpg' %}">
+                {% endif %}
+              </a>
+              <a href="{% url 'web:other' user.by_owner.id %}">{{ user.by_owner }}</a>
+              <div class="content_img">{{ user.by_owner.floor_set.last|safe }}</div>
+              <p>
+                <a href="{% url 'web:topic' user.by_owner.floor_set.last.topic.id %}">{{ user.by_owner.floor_set.last.topic }}</a> / 
+                <a href="{% url 'web:forum' user.by_owner.floor_set.last.topic.forum.id %}">{{ user.by_owner.floor_set.last.topic.forum }}</a>
+              </p> 
+            </div>
+          </li>
+          {% endif %}
+          {% endfor %}
+        </ul>
       </div>
     </div>
     
@@ -145,10 +228,10 @@
             <div class="form-group">
               <label for="{{ field.id_for_label }}">{{ field.label }}</label>
               {{ field }}
-              <span class="error-msg"></span>
+              <span class="error-msg">{{ field.errors.0 }}</span>
             </div>
             {% endfor %}
-            <input id='bindClick' type="submit" class="btn btn-primary" value='创建'>
+            <input id='bindClick' type="submit" class="btn btn-primary" value='申请'>
           </form>
           
         </div>
@@ -159,6 +242,24 @@
 
 {% block js %}
 <script>
+  $(document).ready(function() {
+      var obj = $(".content_img").find("img").css({"max-height":"300px","width":"auto"});
+  });
+  (function(){   
+    var oDiv=document.getElementById("float");   
+    var H=0,iE6;   
+    var Y=oDiv;   
+    while(Y){H+=Y.offsetTop;Y=Y.offsetParent};   
+    iE6=window.ActiveXObject&&!window.XMLHttpRequest;   
+    if(!iE6){   
+        window.onscroll=function()   
+        {   
+            var s=document.body.scrollTop||document.documentElement.scrollTop;   
+            if(s>H){oDiv.className="div1 div2";if(iE6){oDiv.style.top=(s-H)+"px";}}   
+            else{oDiv.className="div1";}       
+        };   
+    }   
+})(); 
   // $.ajaxSetup({
   //     data:{csrfmiddlewaretoken:'{{ csrf_token }}'}
   //   })

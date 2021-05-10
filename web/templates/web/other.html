@@ -14,67 +14,306 @@
     width: 200px;
     float: left;
   }
+  #box {
+    position: relative;
+    right: 2px;
+    border: 2px solid black;
+    padding:10px 24px 10px 24px;
+    width: 200px;
+    float: left;
+  }
+  .div1{}
+  .div2{
+    border: 2px solid black;
+    padding:10px 24px 10px 24px;
+    width: 200px;
+    float: left;
+    position: fixed;
+    top:2%;
+    left: 257px;
+  }
   .forums{
     position: relative;
     left: 2px;
     border: 2px solid black;
-    padding-bottom: 10px;
-    padding-left: 10px;
+    padding: 10px 10px 10px 10px;
     width: 800px;
     float: left;
   }
+  .logo{
+    width: 150px;
+    height: 150px;
+    }
+  img.logo1{
+    width: 150px;
+    height: 150px;
+    border-style: solid;
+    border-color: black;
+    border-width: 4px;
+  } 
+  .divforums{
+  display: none;
+  width: 800px;
+  padding-right: 20px;
+  float: left;
+}
+.forumimg{
+  display: inline-block;
+  width: 154px;
+  height: 154px;
+}
+.forumimg:hover{
+  border: 2px solid black;
+}
+.hottopic{
+  border-bottom: 1px solid #ddd;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.hottopic:hover{
+  background-color: rgb(240,240,240);
+}
+.hottopic a{
+  color: rgb(52,92,161);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 180%;
+}
+.hottopic a:hover{
+  color: red;
+}
+.hottopic p{
+  color: rgb(136,136,136);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 200%;
+}
+.hottopic p a{
+  color: rgb(136,136,136);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 200%;
+}
+#concerned{
+  color: rgb(52,92,161);
+  font-size: 16px;
+  font-weight: 600;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="content">
-  <div class="personage">
-    <div class='logo'>
-      {% if request.user.head_portrait %}
-      <img class='logo1' src='{{ user.head_portrait.url }}'>
+  <div id="box">
+    <div id="float" class="div1">
+      <div class='logo'>
+        {% if request.user.head_portrait %}
+        <img class='logo1' src='{{ user.head_portrait.url }}'>
+        {% else %}
+        <img class='logo1' src="{% static 'img/default.jpg' %}">
+        {% endif %}
+      </div>
+      <h1>{{ user.username }}</h1>
+      {% if  status %}
+      <a id='concerned' href="javascript:unConcerned({{ user.id }});">已关注，取消关注</a>
       {% else %}
-      <img class='logo1' src="{% static 'img/default.jpg' %}">
+      <a id='concerned' href="javascript:Concerned({{ user.id }});">关注</a>
       {% endif %}
+      <h5>个性签名：</h5>
+      {% if user.describe %}
+      <p style="width: 150px;">{{ user.describe }}</p>
+      {% else %}
+      <p>这个人很懒什么也没留下</p>
+      {% endif %}
+      <ul class="nav nav-pills nav-stacked">
+        <li id="li_cforum" role="presentation" class="active"><a href="javascript:void(0)" onclick="switchtag('cforum')">版块中心</a></li>
+        <li id="li_ctopic" role="presentation"><a href="javascript:void(0)" onclick="switchtag('ctopic')">收藏的帖子</a></li>
+        <li id="li_stopic" role="presentation"><a href="javascript:void(0)" onclick="switchtag('stopic')">发出的帖子</a></li>
+        <li id="li_floor" role="presentation"><a href="javascript:void(0)" onclick="switchtag('floor')">发出的回复</a></li>
+      </ul>
     </div>
-    <h1>{{ user.username }}</h1>
-    {% if request.user.power == 4 or request.user.power == 3 %}
-    <a href="{% url 'web:change_power' user.id %}">修改权限</a>
-    {% endif %}
-    <h5>个性签名：</h5>
-    {% if user.describe %}
-    <p style="width: 150px;">{{ user.describe }}</p>
-    {% else %}
-    <p>这个人很懒什么也没留下</p>
-    {% endif %}
   </div>
   <div class="forums">
-    <h4>他关注的版块</h4>
-    {% for concerned in user.usertoforum_set.all %}
-    {% if concerned.status == 1 %}
-    <div id='concerned_{{ concerned.forum.id }}'>
-      <a  href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
+    <div class="divforums" id="cforum" style="display: block;">
+      <div style="width: 800px;">
+        <h2>关注的版块</h2>
+        {% for concerned in user.usertoforum_set.all %}
+        {% if concerned.status == 1 %}
+        <div style="float: left;margin: 4px 20px 4px 20px;">
+        <a href="{% url 'web:forum' concerned.forum.id%}" class="forumimg">
+          <img style="height: 150px; width: 150px;" src='{{ concerned.forum.picture.url }}'>
+        </a>
+        <div id='concerned_{{ concerned.forum.id }}'>
+          <a  href="{% url 'web:forum' concerned.forum.id %}">{{ concerned.forum }}</a>
+        </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+      </div>
     </div>
-    {% endif %}
-    {% endfor %}
-  </div>
+    <div class="divforums" id="ctopic">
+      <h4>收藏的帖子</h4>
+      {% for collect in user.collect_set.all %}
+      {% if collect.status == 1 %}
+      <li>
+        <div class="hottopic">
+          <a href="{% url 'web:topic' collect.topic.id %}">{{ collect.topic }}</a>
+          <div class="content_img">{{ collect.topic.floor_set.first|safe }}</div>
+          <p>
+            <i class="fa fa-user"></i> 
+            <a href="{% url 'web:other' collect.topic.floor_set.first.owner.id%}">{{ collect.topic.floor_set.first.owner }}</a> / 
+            <a href="{% url 'web:forum' collect.topic.forum.id%}">{{ collect.topic.forum }}</a>
+          </p> 
+        </div>
+      </li>
+      
+      {% endif %}
+      {% endfor %}
+    </div>
+    <div class="divforums" id="stopic">
+      <h4>发起的帖子</h4>
+      {% for topic in user.topic_set.all %}
+      <li>
+        <div class="hottopic">
+          <a href="{% url 'web:topic' topic.id %}">{{ topic }}</a>
+          <div class="content_img">{{ topic.floor_set.first|safe }}</div>
+          <p>
+            <i class="fa fa-user"></i> 
+            <a href="{% url 'web:other' topic.floor_set.first.owner.id%}">{{ topic.floor_set.first.owner }}</a> / 
+            <a href="{% url 'web:forum' topic.forum.id%}">{{ topic.forum }}</a>
+          </p> 
+        </div>
+      </li>
+      
+      {% endfor %}
+    </div>
+    <div class="divforums" id="floor">
+      <h4>发出的回复</h4>
+      {% for floor in user.floor_set.all %}
+      <li>
+        <div class="hottopic">
+          <a href="{% url 'web:topic' floor.topic.id %}">{{ floor.topic }}</a>
+          <div class="content_img">{{ floor|safe }}</div>
+          <p>
+            <i class="fa fa-user"></i> 
+            <a href="{% url 'web:other' floor.owner.id%}">{{ floor.owner }}</a> / 
+            <a href="{% url 'web:forum' floor.topic.forum.id%}">{{ floor.topic.forum }}</a>
+          </p> 
+        </div>
+      </li>
+      {% endfor %}
+    </div>
+  </div>  
 </div>
+<div style="height: 110px;position: fixed;bottom:-30px;right: 10%;">
+  <ul >
+    <li >
+      <div style="background-color: #337ab7;width: 50px;height: 50px;border-radius:4px;">
+        <a href="javascript:void(0)" onclick="goto_top()">
+          <i class="fa fa-chevron-up fa-2x" style="color: rgb(234,240,251);position: relative;left:11px ;top:10px"></i>
+        </a>
+      </div>
+    </li>
+  </ul>
+</div>  
     
 {% endblock %}
 
 {% block js %}
   <script>
-    function unConcerned(id) {
-      var pk = id
-      var url = '/unconcerned/' + pk + '/'
-      $.ajax({
-        url: url,
-        type: "POST",
-        success: function (res) {
-          if(res.status){
-            $('#concerned_'+id).remove();
-          }
+    function switchtag(a){
+    $(".divforums").hide();
+    $("#"+a).slideDown("slow");
+    $('.active').removeClass("active");
+    $('#li_'+a).addClass("active");
+}
+      $(document).ready(function() {
+      var obj = $(".content_img").find("img").css({"max-height":"300px","width":"auto"});
+  });
+  (function(){   
+    var oDiv=document.getElementById("float");   
+    var H=0,iE6;   
+    var Y=oDiv;   
+    while(Y){H+=Y.offsetTop;Y=Y.offsetParent};   
+    iE6=window.ActiveXObject&&!window.XMLHttpRequest;   
+    if(!iE6){   
+        window.onscroll=function()   
+        {   
+            var s=document.body.scrollTop||document.documentElement.scrollTop;   
+            if(s>H){oDiv.className="div1 div2";if(iE6){oDiv.style.top=(s-H)+"px";}}   
+            else{oDiv.className="div1";}       
+        };   
+    }   
+})(); 
+var goto_top_type = -1;  
+var goto_top_itv = 0;  
+  
+function goto_top_timer() {  
+    var y = goto_top_type == 1 ? document.documentElement.scrollTop  
+            : document.body.scrollTop;  
+    var moveby = 15;  
+    y -= Math.ceil(y * moveby / 100);  
+    if (y < 0) {  
+        y = 0;  
+    }  
+    if (goto_top_type == 1) {  
+        document.documentElement.scrollTop = y;  
+    } else {  
+        document.body.scrollTop = y;  
+    }  
+    if (y == 0) {  
+        clearInterval(goto_top_itv);  
+        goto_top_itv = 0;  
+    }  
+}  
+  
+function goto_top() {  
+    if (goto_top_itv == 0) {  
+        if (document.documentElement && document.documentElement.scrollTop) {  
+            goto_top_type = 1;  
+        } else if (document.body && document.body.scrollTop) {  
+            goto_top_type = 2;  
+        } else {  
+            goto_top_type = 0;  
+        }  
+        if (goto_top_type > 0) {  
+            goto_top_itv = setInterval('goto_top_timer()', 50);  
+        }  
+    }  
+} 
+function Concerned(id) {
+            var pk = id
+            var url = '/concerned_user/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#concerned').text("已关注，取消关注");
+                    var script = 'javascript:unConcerned(' + pk + ');'
+                    $('#concerned').attr("href",script);
+                    }
+                    else{
+                      window.alert('不能关注自己')
+                    }
+                }
+            })
         }
-      })
-    }
+        function unConcerned(id) {
+            var pk = id
+            var url = '/unconcerned_user/' + pk + '/'
+            $.ajax({
+                url: url,
+                type: "POST",
+                success: function (res) {
+                    if(res.status){
+                    $('#concerned').text("关注");
+                    var script = 'javascript:Concerned(' + pk + ');'
+                    $('#concerned').attr("href",script);
+                    }
+                }
+            })
+        }
   </script>
 {% endblock %}

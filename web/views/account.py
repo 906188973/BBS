@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from web.form.account import RegisterModelForm, SendSmsForm, LoginSMSForm, LoginForm
-from web.form.account import HeadForm
+from web.form.account import HeadForm, PasswordForm, AccountForm
 from django.http import HttpResponse, JsonResponse
 from web import models
 from django.db.models import Q
@@ -94,9 +94,14 @@ def logout(request):
 
 def account(request):
     """个人页"""
-    return render(request, 'web/account.html')
+    head_form = HeadForm()
+    password_form = PasswordForm(request)
+    user = request.user
+    account_form = AccountForm(request, instance=user)
+    context = {'head_form': head_form, 'password_form': password_form, 'account_form': account_form}
+    return render(request, 'web/account.html', context)
 
-def headupload(request):
+def headupdate(request):
     """更新头像"""
     if request.method == 'POST':
         # 取出文件后缀名,这里前端给我传的文件key为`文件`,大部分默认文件key为`file`
@@ -112,12 +117,68 @@ def headupload(request):
         obj.head_portrait = img
         obj.save()
         return redirect('web:account')
-    form = HeadForm()
-    context = {'form': form}
-    return render(request, 'web/headupload.html', context)
+
+def passwordupdate(request):
+    """更新密码"""
+    if request.method == 'POST':
+        form = PasswordForm(request, data=request.POST)
+        if form.is_valid():
+            obj = models.UserInfo.objects.get(id=request.user.id)
+            obj.password = form.cleaned_data['new_password']
+            obj.save()
+
+            return JsonResponse({'status': True})
+        return JsonResponse({'status': False, 'error': form.errors})
+
+def accountupdate(request):
+    """更新密码"""
+    if request.method == 'POST':
+        form = AccountForm(request, data=request.POST)
+        if form.is_valid():
+            user = models.UserInfo.objects.get(id=request.user.id)
+            user.username = form.cleaned_data['username']
+            user.describe = form.cleaned_data['describe']
+            user.save()
+
+            return JsonResponse({'status': True})
+        return JsonResponse({'status': False, 'error': form.errors})
 
 def other(request, id):
     """他人个人页"""
     user = models.UserInfo.objects.get(id=id)
     context = {'user': user}
+    obj = models.UserToUser.objects.filter(by_owner=int(id), user=request.user).first()
+
+    if not obj:
+        status = False
+    else:
+        status = obj.status
+    context['status'] = status
     return render(request, 'web/other.html', context)
+
+def concerned_user(request, id):
+    """关注"""
+    if request.method == 'POST':
+        obj = models.UserToUser.objects.filter(by_owner=int(id), user=request.user).first()
+        if obj:
+            obj.status = True
+            obj.save()
+        else:
+            usertouser = models.UserToUser()
+            by_owner = models.UserInfo.objects.get(id=int(id))
+            if by_owner == request.user:
+                return JsonResponse({'status': 'False'})
+            usertouser.user = request.user
+            usertouser.by_owner = by_owner
+            usertouser.save()
+
+        return JsonResponse({'status': 'True'})
+
+def unconcerned_user(request, id):
+    """取消关注"""
+    if request.method == 'POST':
+
+        obj = models.UserToUser.objects.filter(by_owner=int(id), user=request.user).first()
+        obj.status = False
+        obj.save()
+        return JsonResponse({'status': 'True'})

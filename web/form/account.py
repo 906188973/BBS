@@ -13,6 +13,7 @@ class BootStrapForm():
         super().__init__(*args, **kwargs)
         for name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
+            field.widget.attrs['autocomplete'] = 'off'
             field.widget.attrs['placeholder'] = '请输入{}'.format(field.label)
 
 class RegisterModelForm(BootStrapForm, forms.ModelForm):
@@ -165,10 +166,13 @@ class LoginForm(BootStrapForm, forms.Form):
     def __init__(self, request, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.request = request
+
+
     def clean_password(self):
         pwd = self.cleaned_data['password']
         #加密&返回
         return encrypt.md5(pwd)
+
     def clean_code(self):
         """钩子 图片验证码是否正确"""
         code = self.cleaned_data['code']
@@ -187,3 +191,84 @@ class HeadForm(forms.Form):
   class Meta:
       model = models.UserInfo
       fields = ['head_portrait']
+
+class PasswordForm(BootStrapForm, forms.ModelForm):
+    """修改密码表单"""
+    password = forms.CharField(
+        label='新密码',
+        min_length=8,
+        max_length=20,
+        widget=forms.PasswordInput
+    )
+    new_password = forms.CharField(
+        label='新密码',
+        min_length=8,
+        max_length=20,
+        error_messages={
+            'min_length':"密码长度不能小于8个字符",
+            'max_length':"密码长度不能大于20个字符"
+        },
+        widget=forms.PasswordInput
+    )
+    confirm_password = forms.CharField(
+        label='重复新密码',
+        min_length=8,
+        max_length=20,
+        error_messages={
+            'min_length': "重复密码长度不能小于8个字符",
+            'max_length': "重复密码长度不能大于20个字符"
+        },
+        widget=forms.PasswordInput
+    )
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    class Meta:
+        model = models.UserInfo
+        fields = ['password', 'new_password', 'confirm_password']
+
+
+    def clean_password(self):
+        pwd = self.cleaned_data['password']
+        pwd = encrypt.md5(pwd)
+        user = models.UserInfo.objects.get(id=self.request.user.id)
+        if pwd != user.password:
+            raise ValidationError('原密码错误')
+        return encrypt.md5(pwd)
+
+    def clean_new_password(self):
+        pwd = self.cleaned_data['new_password']
+        return encrypt.md5(pwd)
+
+    def clean_confirm_password(self):
+        pwd = self.cleaned_data['new_password']
+        confirm_pwd = self.cleaned_data['confirm_password']
+        confirm_pwd = encrypt.md5(confirm_pwd)
+        if pwd != confirm_pwd:
+            raise ValidationError('新密码不相同')
+        user = models.UserInfo.objects.get(id=self.request.user.id)
+        if pwd == user.password:
+            raise ValidationError('和原密码相同')
+        return confirm_pwd
+
+class AccountForm(BootStrapForm, forms.ModelForm):
+    """个人资料表单"""
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.request = request
+
+    class Meta:
+        model = models.UserInfo
+        fields = ['username', 'describe']
+
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if username != self.request.user.username:
+            exists = models.UserInfo.objects.filter(username=username).exists()
+            if exists:
+                raise ValidationError('用户名已存在')
+        return username
