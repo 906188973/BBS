@@ -6,16 +6,17 @@ function replySubmit(id){
         dataType:"JSON",
         success:function (res) {
             if(res.status){
-                if(res.owner_status){
-                    var comment_html = '<div id="reply_' + res.reply_id + '"><span>' + res.username +
-                                 ':回复' + res.by_owner
-                }else{
-                    var comment_html = '<div id="reply_' + res.reply_id + '"><span>' + res.username
-                    }
-                var comment_html = comment_html + '</span><span> (' + res.comment_time + 
-                    '):</span><div><span>' + res.text + '</span><a >回复</a><a href="javascript:replyDel(' +
-                    res.reply_id + ');"> 删除</a></div></div>';
-                $(".reply_list_"+id).append(comment_html);
+                location.reload();
+                // if(res.owner_status){
+                //     var comment_html = '<div id="reply_' + res.reply_id + '"><span>' + res.username +
+                //                  ':回复' + res.by_owner
+                // }else{
+                //     var comment_html = '<div id="reply_' + res.reply_id + '"><span>' + res.username
+                //     }
+                // var comment_html = comment_html + '</span><span> (' + res.comment_time + 
+                //     '):</span><div><span>' + res.text + '</span><a >回复</a><a href="javascript:replyDel(' +
+                //     res.reply_id + ');"> 删除</a></div></div>';
+                // $(".reply_list_"+id).append(comment_html);
             }else{
                    console.log('error');
             }
